@@ -155,41 +155,45 @@ Acceptance:
 
 ## Phase 3 Tasks
 
-### Task 3.1: Add Chapter 1 Story
-Likely files:
+### Task 3.1: Expand Chapter 0 and Chapter 1 Narrative
+Files:
+- data/metadata.js
 - data/scenes.js
-- data/characters.js
 - data/clues.js
 
 Goal:
-Implement the lost girl call.
+Expand the opening into a richer Chapter 0 + Chapter 1 arc.
+New Chapter 0: chapter0_arrival (entering station) and chapter0_terminal (booting terminal).
+New Chapter 1 middle scene: chapter1_tension_rises (mandatory, reached by both initial choices).
+New Chapter 1 alt branch: chapter1_comfort_alt (shown when pressedForDetails flag is true).
+New clues: clue_static_interference, clue_wrong_number_doubt.
+Polish existing scene texts.
+startSceneId updated to chapter0_arrival.
 
 Acceptance:
-- Chapter 1 can be completed
-- Lin Xia can be saved or lost
-- Red light clue can be obtained
+- Game starts at chapter0_arrival, not chapter0_start
+- Chapter 0 three-scene intro plays through to phone ring
+- Both chapter1_lin_xia_call choices reach chapter1_tension_rises
+- chapter1_tension_rises shows two mutually exclusive comfort choices based on pressedForDetails flag
+- Player who pressed for details reaches chapter1_comfort_alt; gentle player reaches chapter1_comfort
+- chapter1_comfort_alt text differs from chapter1_comfort
+- clue_static_interference added via all chapter1_tension_rises paths
+- clue_wrong_number_doubt added only via the doubt path
+- chapter1_question conditional "追问她的迟疑" still works (clue_lin_xia_hesitation added on investigative path)
+- All scene links valid; no broken nextSceneId references
+- No JS errors in console on any playthrough
 
 ---
 
-### Task 3.2: Add Chapter 2 Story
-Likely files:
-- data/scenes.js
-- data/characters.js
-- data/clues.js
-
+### Task 3.2: Add Chapter 2 Story (DEFERRED — Phase 4+)
 Goal:
-Implement the taxi driver call.
-
-Acceptance:
-- Driver Zhou call can be completed
-- Station connection clue can be obtained
+Implement the taxi driver call. Deferred until trust/save system is designed.
 
 ---
 
-### Task 3.3: Add Chapter 3 Story
-Likely files:
+### Task 3.3: Add Chapter 3 Story (DEFERRED — Phase 4+)
+Files:
 - data/scenes.js
-- data/characters.js
 - data/clues.js
 
 Goal:
