@@ -82,7 +82,7 @@ Likely files:
 - game.js
 
 Goal:
-Load current scene and move between scenes. game.js is the entry point only: it imports and wires engine.js, state.js, and ui.js together, then calls engine.start(). It does not contain rendering logic. Rendering is Task 1.5's responsibility.
+Load current scene and move between scenes. game.js is the entry point only: it imports and wires engine.js, state.js, and ui.js together, then calls Engine.init(). It does not contain rendering logic. Rendering is Task 1.5's responsibility.
 
 Acceptance:
 - Current scene displays

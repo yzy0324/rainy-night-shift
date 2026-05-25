@@ -1,8 +1,7 @@
 // ── UI Renderer ───────────────────────────────────────────────────────────────
 // Responsibilities: read a scene object, write to DOM.
 // Does NOT contain game logic — delegates navigation to Engine.
-// Phase 2 extension points: renderClues(), renderStatus() added here without
-// touching any other file.
+// Phase 2: null-checks added for containers; chooseOption receives full choice.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.UI = {
@@ -17,12 +16,14 @@ window.UI = {
   // textContent is used — never innerHTML — to prevent HTML injection.
   renderStory(speaker, text) {
     const container = document.getElementById("story-container");
+    if (!container) { console.error("UI: #story-container not found"); return; }
     container.textContent = (speaker ? speaker + "：" : "") + text;
   },
 
   // Build choice buttons, or show the ending message if choices is empty.
   renderChoices(choices) {
     const container = document.getElementById("choices-container");
+    if (!container) { console.error("UI: #choices-container not found"); return; }
     container.innerHTML = "";
 
     if (!choices || choices.length === 0) {
@@ -40,7 +41,7 @@ window.UI = {
         container.querySelectorAll("button").forEach(b => {
           b.disabled = true;
         });
-        Engine.chooseOption(choice.nextSceneId);
+        Engine.chooseOption(choice);  // pass full choice object (effects + nextSceneId)
       });
 
       container.appendChild(btn);
@@ -50,6 +51,7 @@ window.UI = {
   // Replace the choices area with a static end-of-shift message.
   showEnding() {
     const container = document.getElementById("choices-container");
+    if (!container) { console.error("UI: #choices-container not found"); return; }
     container.innerHTML = "";
 
     const msg = document.createElement("p");

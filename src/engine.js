@@ -1,7 +1,7 @@
 // ── Game Engine ───────────────────────────────────────────────────────────────
 // Responsibilities: init, scene lookup (O(1) map), navigate between scenes.
 // Does NOT manipulate the DOM — delegates all rendering to UI.
-// Phase 2 extension points: chooseOption() is where effects/conditions hook in.
+// Phase 2: applies effects and filters choices via conditions.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.Engine = {
@@ -10,7 +10,8 @@ window.Engine = {
   _ui:        null,
 
   // Called once by game.js when the player clicks Begin.
-  init(metadata, scenes, ui) {
+  init(metadata, scenes, ui, clues) {
+    GameState.reset();   // ← Phase 1 non-blocker fix: clear stale state on init
     this._ui = ui;
 
     // Build O(1) scene lookup map from the flat array.
@@ -21,7 +22,11 @@ window.Engine = {
 
     console.log("engine: init — scenes indexed:", Object.keys(this._scenesMap).length);
 
-    GameState.currentSceneId = metadata.startSceneId;
+    // Optional: log clue IDs for validation.
+    if (clues) {
+      console.log("engine: clues registered:", Object.keys(clues).join(", "));
+    }
+
     this.loadScene(metadata.startSceneId);
   },
 
@@ -46,14 +51,29 @@ window.Engine = {
     }
 
     GameState.currentSceneId = sceneId;
-    this._ui.render(scene);
+
+    // Filter out choices whose conditions are not met.
+    // Use a shallow copy — do not mutate the original scene object.
+    const visibleChoices = (scene.choices || []).filter(
+      choice => Conditions.check(choice.condition)
+    );
+
+    this._ui.render({
+      id:        scene.id,
+      chapterId: scene.chapterId,
+      type:      scene.type,
+      speaker:   scene.speaker,
+      text:      scene.text,
+      choices:   visibleChoices
+    });
   },
 
   // Called by UI when the player clicks a choice button.
-  // Phase 2: apply effects and evaluate conditions here before navigating.
-  chooseOption(nextSceneId) {
-    console.log("engine: chooseOption →", nextSceneId);
-    this.loadScene(nextSceneId);
+  // Applies effects from the choice, then navigates to the next scene.
+  chooseOption(choice) {
+    console.log("engine: chooseOption →", choice.nextSceneId);
+    Effects.apply(choice.effects);
+    this.loadScene(choice.nextSceneId);
   }
 
 };

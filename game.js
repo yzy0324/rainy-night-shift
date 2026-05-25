@@ -1,5 +1,5 @@
 // ── Entry Point ───────────────────────────────────────────────────────────────
-// Wires together: METADATA, SCENES, GameState, Engine, UI.
+// Wires together: METADATA, SCENES, CLUES, GameState, Engine, UI.
 // Owns the Begin button handler only — no game logic here.
 // No import/export — loaded last by plain <script> tag.
 
@@ -20,6 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   beginBtn.addEventListener("click", () => {
     startScreen.style.display = "none";
     gameScreen.style.display  = "block";
-    Engine.init(METADATA, SCENES, UI);
+    Engine.init(METADATA, SCENES, UI, CLUES);
   });
 });
