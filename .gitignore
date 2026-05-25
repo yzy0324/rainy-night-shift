@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment variables / API keys
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+
+# Claude / AI temporary outputs
+ai-council-output.md
+ai-council-review.md
+
+# OS files
+.DS_Store
+Thumbs.db
