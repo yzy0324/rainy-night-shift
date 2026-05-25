@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雨夜值班室 / Night Shift Dispatch</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Start Screen ──────────────────────────────────── -->
+  <div id="start-screen">
+    <h1 id="game-title">雨夜值班室</h1>
+    <p  id="game-subtitle">Night Shift Dispatch</p>
+    <p  id="atmosphere-text">雨夜值班室。电话铃响。你接起。</p>
+    <button id="begin-btn">开始值班</button>
+  </div>
+
+  <!-- ── Game Screen (hidden on load) ─────────────────── -->
+  <div id="game-screen" style="display:none;">
+    <div id="story-container"></div>
+    <div id="choices-container"></div>
+  </div>
+
+  <!-- Script load order: metadata → scenes → state → engine → ui → game -->
+  <script src="data/metadata.js"></script>
+  <script src="data/scenes.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/engine.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="game.js"></script>
+
+</body>
+</html>
