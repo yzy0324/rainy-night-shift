@@ -37,6 +37,25 @@
 //           chapter4_south_gate_route: second choice added (let_her_through_south
 //           → ending_failed_interception). ending_failed_interception now reachable.
 //           send_evidence choice comment added (full-truth gating deferred).
+// Phase 9:  16 new scenes — Chapter 4 bridge + Chapter 5 horror layer.
+//           chapter4_evidence_choice: send_evidence now leads to chapter4_full_truth_bridge.
+//           New bridge: chapter4_full_truth_bridge (realistic case resolved + horror fork).
+//           New Ch.5 scenes: chapter5_broadcast_returns, chapter5_broadcast_wont_stop,
+//           chapter5_crowd_on_platform, chapter5_lin_xia_memory, chapter5_system_log,
+//           chapter5_logbook_self, chapter5_third_call, chapter5_phone_keeps_ringing,
+//           chapter5_phone_unplugged, chapter5_voice_answers, chapter5_see_self,
+//           chapter5_protect_lin_xia.
+//           New horror endings: ending_true_horror, ending_taken_by_shift,
+//           ending_lin_xia_left_behind.
+//           New flags: sawOldPassengers, heardOwnVoice, answeredThirdCall.
+//           Total scenes: 60.
+// Phase 9.1: flag activation + evidence quality + horror escalation gate.
+//           Trust flags wired into Ch.1 effects: comfortedLinXia, usedCarefulQuestions,
+//           pressedTooHard. chapter4_full_truth_bridge: third choice added, gated on
+//           jammerEvidenceSaved → ending_full_truth_complete. chapter5_voice_answers:
+//           zoom_in gated on heardOwnVoice; trust-warning choice added (comfortedLinXia).
+//           New scenes: chapter5_lin_xia_trust_warning, ending_full_truth_complete.
+//           Total scenes: 62.
 // Choices carry optional effects and condition fields.
 //   effects   — array applied when the choice is selected.
 //   condition — single object; choice hidden if condition returns false.
@@ -109,7 +128,9 @@ window.SCENES = [
         label:       "别怕，告诉我情况。",
         nextSceneId: "chapter1_tension_rises",
         effects: [
-          { type: "setFlag", key: "pressedForDetails", value: false, operation: "set" }
+          { type: "setFlag", key: "pressedForDetails", value: false, operation: "set" },
+          // Phase 9.1: seed high-trust flag used by Chapter 5 warning branch.
+          { type: "setFlag", key: "comfortedLinXia",   value: true }
         ]
       },
       {
@@ -118,6 +139,8 @@ window.SCENES = [
         nextSceneId: "chapter1_tension_rises",
         effects: [
           { type: "setFlag", key: "pressedForDetails", value: true,  operation: "set" },
+          // Phase 9.1: seed low-trust flag.
+          { type: "setFlag", key: "pressedTooHard",    value: true },
           { type: "addClue", key: "clue_lin_xia_hesitation",         operation: "push" }
         ]
       }
@@ -141,7 +164,9 @@ window.SCENES = [
         nextSceneId: "chapter1_comfort",
         condition: { type: "flag", key: "pressedForDetails", operator: "equals", value: false },
         effects: [
-          { type: "addClue", key: "clue_static_interference", operation: "push" }
+          { type: "addClue", key: "clue_static_interference", operation: "push" },
+          // Phase 9.1: careful-questions flag — reinforces high-trust path.
+          { type: "setFlag", key: "usedCarefulQuestions",     value: true }
         ]
       },
       {
@@ -1038,10 +1063,12 @@ window.SCENES = [
       // NOTE: Ideal gate — linXiaRescued=true AND (dispatchWarned=true OR patrolOnWay=true).
       // conditions.js supports only one condition per choice (no AND/OR nesting).
       // Full-truth gating is deferred until the condition system is extended.
+      // Phase 9: now leads to chapter4_full_truth_bridge (bridge → ending_full_truth
+      // or optional horror route chapter5_broadcast_returns).
       {
         id:          "send_evidence",
         label:       "立刻把证据发给调度和警方",
-        nextSceneId: "ending_full_truth"
+        nextSceneId: "chapter4_full_truth_bridge"
       },
       {
         id:          "protect_first",
@@ -1059,12 +1086,27 @@ window.SCENES = [
   // ── Ending: full truth ────────────────────────────────────────────────────
   // Best ending. Lin Xia is rescued, evidence submitted, patrol acts in time.
   // All three threads — the van, Chen Ming, the suspect — reach resolution.
+  // Still reachable via end_shift choice in chapter4_full_truth_bridge.
   {
     id:        "ending_full_truth",
     chapterId: "ending",
     type:      "ending",
     speaker:   "系统",
     text:      "调度中心收到了视频。\n\n十分钟后，巡逻车抵达北桥站。南门外，灰色面包车的两名人员被控制，信号干扰设备被扣押，车牌被记录在案。陈明也被找到了。他没有逃跑，主动向警方说明了情况——他是被威胁参与的，不是主谋。\n\n天快亮的时候，林夏还坐在值班室里，手里捧着热水，头发还是湿的。\n\n她说：「我以为今晚不会有人信我。」\n\n北桥站的广播第一次恢复清晰，播报第一班早班列车进站。\n\n雨停了。",
+    choices:   []
+  },
+
+  // ── Ending: full truth (complete evidence chain) ──────────────────────────
+  // Phase 9.1: enhanced ending — reachable only when jammerEvidenceSaved = true.
+  // The player recorded the interference device on camera in chapter3_van_observe.
+  // That footage closes all three threads and makes the case bury-proof.
+  // The old-platform anomaly persists — a reminder it is a separate problem.
+  {
+    id:        "ending_full_truth_complete",
+    chapterId: "ending",
+    type:      "ending",
+    speaker:   "系统",
+    text:      "调度中心收到了完整的视频文件，连同干扰设备的画面截图和南门车牌的局部记录。\n\n十分钟后，巡逻车抵达北桥站。南门外，灰色面包车的两名人员被控制。信号干扰设备作为实物证据被扣押——摄像头记录的型号与面包车内安装位置，形成了完整的证据链。车牌后两位与调度中心记录吻合，确认了今晚的干扰来源。\n\n陈明没有逃跑。他主动向警方说明了所有情况，并供出了幕后的组织者。这一次，整个案子难以被压下去了。\n\n天快亮的时候，林夏还坐在值班室里，手里捧着热水，头发还是湿的。\n\n她说：「我以为今晚不会有人信我。我以为就算信了，也没有用。」\n\n北桥站的广播第一次恢复清晰，播报第一班早班列车进站。\n\n雨停了。旧三号站台的监控画面，仍然是黑的。",
     choices:   []
   },
 
@@ -1126,6 +1168,369 @@ window.SCENES = [
     type:      "ending",
     speaker:   "系统",
     text:      "你搁下了今夜的值班记录，拉开椅子站起身来。外面的雨已经停了，街上安静得像什么都没有发生过。也许真的什么都没发生。只是——那个外地号码，还在记录本的最后一页上，没有解释。",
+    choices:   []
+  },
+
+  // ── Chapter 4 bridge: full truth resolved ────────────────────────────────
+  // Reached from chapter4_evidence_choice → send_evidence.
+  // The realistic criminal case appears fully resolved. A brief broadcast
+  // anomaly offers the player an optional horror continuation (chapter5).
+  // Choosing to end the night preserves ending_full_truth unchanged.
+  {
+    id:        "chapter4_full_truth_bridge",
+    chapterId: "chapter4",
+    type:      "system",
+    speaker:   "系统",
+    text:      "调度中心确认收到了视频文件。\n\n值班室窗外，巡逻车的蓝光扫过雨中的南门。灰色面包车的两名人员已被带走。信号干扰设备被扣押，陈明也将配合警方说明情况。\n\n林夏坐在你对面。她还没说话，但她在值班室里，是安全的。存储卡已经不在她手里了。\n\n雨还在下。广播系统的指示灯忽然亮了一下——然后灭掉了。",
+    choices: [
+      {
+        id:          "end_shift",
+        label:       "结束值班，今晚的事就到这里",
+        nextSceneId: "ending_full_truth"
+      },
+      {
+        // Phase 9.1: enhanced ending — only visible when jammer footage was recorded.
+        id:          "submit_complete_evidence",
+        label:       "提交完整证据链，结束今晚",
+        condition:   { type: "flag", key: "jammerEvidenceSaved", operator: "equals", value: true },
+        nextSceneId: "ending_full_truth_complete"
+      },
+      {
+        id:          "check_broadcast",
+        label:       "去查一下那个广播异常",
+        nextSceneId: "chapter5_broadcast_returns"
+      }
+    ]
+  },
+
+  // ── Chapter 5: 旧站台重新开放 / The Old Platform Reopens ─────────────────
+  // Horror layer — optional continuation from chapter4_full_truth_bridge.
+  // The realistic case is resolved. Something older is beginning.
+
+  {
+    id:        "chapter5_broadcast_returns",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你走向广播控制台。\n\n指示灯是灭的。系统日志显示最后一次广播在二十分钟前——那是你用来引导林夏的那条。此后没有任何操作记录。\n\n但广播里传来一句话：\n\n「旧三号站台末班列车即将进站，请旅客做好乘车准备。」\n\n声音非常清晰，比今晚任何一次广播都清晰。\n\n林夏从椅子上抬起头。她说：「我进旧站台之前……也听到了这句话。」",
+    choices: [
+      {
+        id:          "turn_off_broadcast",
+        label:       "尝试关掉广播系统",
+        nextSceneId: "chapter5_broadcast_wont_stop"
+      },
+      {
+        id:          "check_platform3_cctv",
+        label:       "调出旧三号站台监控",
+        nextSceneId: "chapter5_crowd_on_platform"
+      },
+      {
+        id:          "ask_lin_xia",
+        label:       "问林夏她记得什么",
+        nextSceneId: "chapter5_lin_xia_memory"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_broadcast_wont_stop",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你把广播系统的主电源关掉。\n\n控制台显示：广播关闭。\n\n广播还在响。\n\n同样的那句话，重复了第二次。声音没有变小，也没有任何杂音。\n\n第三次播出的时候，声音变了。\n\n不是录音。是一个人在实时说话——语调、停顿、甚至犹豫的位置，都和今晚你引导林夏时一模一样。\n\n是你的声音。",
+    choices: [
+      {
+        id:          "check_system_log",
+        label:       "查看系统日志",
+        effects:     [{ type: "setFlag", key: "heardOwnVoice", value: true }],
+        nextSceneId: "chapter5_system_log"
+      },
+      {
+        id:          "back_to_cctv",
+        label:       "回到监控台",
+        effects:     [{ type: "setFlag", key: "heardOwnVoice", value: true }],
+        nextSceneId: "chapter5_crowd_on_platform"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_crowd_on_platform",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你把旧三号站台的监控画面调出来。\n\n今晚你已经在这个画面里确认过林夏的位置。那时画面是模糊的，雪花很多。\n\n现在画面非常清晰。\n\n站台上站着一群人。他们衣服是湿的，像是刚淋过很久的雨。他们面对摄像头，一动不动。\n\n前排有一个小孩，手里拿着一张纸质车票，票面朝向镜头。\n\n你能看清时间：23:47。",
+    choices: [
+      {
+        id:          "check_system_time",
+        label:       "查看系统时间",
+        effects:     [{ type: "setFlag", key: "sawOldPassengers", value: true }],
+        nextSceneId: "chapter5_system_log"
+      },
+      {
+        id:          "ask_about_passengers",
+        label:       "问林夏关于站台上的人",
+        effects:     [{ type: "setFlag", key: "sawOldPassengers", value: true }],
+        nextSceneId: "chapter5_lin_xia_memory"
+      },
+      {
+        id:          "cut_feed",
+        label:       "关掉画面，保护林夏",
+        effects:     [{ type: "setFlag", key: "sawOldPassengers", value: true }],
+        nextSceneId: "chapter5_protect_lin_xia"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_lin_xia_memory",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "林夏",
+    text:      "林夏看了一眼你调出的监控画面，然后把视线移开了。\n\n「他们问我有没有来接班。」\n\n你问：那些人？\n\n「他们站在站台上，排队的样子。其中一个走过来问我，说值班员要来了，让我先等着。」\n\n她停了一下。\n\n「我以为他们是真实的旅客。直到我意识到那个站台十年前就关掉了，最后一班列车不可能再来了。」",
+    choices: [
+      {
+        id:          "check_logbook",
+        label:       "去查值班日志",
+        nextSceneId: "chapter5_logbook_self"
+      },
+      {
+        id:          "protect_lin_xia_memory",
+        label:       "让林夏不要再看监控",
+        nextSceneId: "chapter5_protect_lin_xia"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_system_log",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你调出今晚的系统操作日志。\n\n最近一条是你关掉广播系统的记录，时间正确。\n\n但往前翻，你发现了一段你没有操作过的记录：\n\n23:47 — 值班员确认末班列车进站\n23:47 — 值班员确认末班列车进站\n23:47 — 值班员确认末班列车进站\n\n同一行记录，重复了很多次。时间戳都是 23:47。\n\n你今晚从来没有操作过这个确认功能。",
+    choices: [
+      {
+        id:          "open_accident_record",
+        label:       "打开旧事故档案",
+        nextSceneId: "chapter5_logbook_self"
+      },
+      {
+        id:          "delete_log",
+        label:       "尝试删除这条记录",
+        nextSceneId: "chapter5_broadcast_wont_stop"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_logbook_self",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你翻开今晚的值班日志。\n\n前几页是你写的，字迹是你的，内容是你的。\n\n最后一页有一行字，你没有写过：\n\n「第三通电话，不要接。」\n\n字迹也是你的。\n\n这时，值班电话响了。\n\n来电显示：旧三号站台 — 值班岗亭",
+    choices: [
+      {
+        id:          "answer_phone",
+        label:       "接起电话",
+        nextSceneId: "chapter5_third_call"
+      },
+      {
+        id:          "ignore_phone",
+        label:       "不接",
+        nextSceneId: "chapter5_phone_keeps_ringing"
+      },
+      {
+        id:          "unplug_phone",
+        label:       "拔掉电话线",
+        nextSceneId: "chapter5_phone_unplugged"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_third_call",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你拿起话筒。\n\n电话那边是雨声。是今晚一直在下的那种雨声，但密度更大，像是从更深的地方传来的。背景里有很多人均匀的呼吸声，像是一群人在等待。\n\n然后一个声音说：\n\n「值班员，列车已经进站，请确认。」\n\n你认得这个声音。\n\n这是你自己的声音。",
+    choices: [
+      {
+        id:          "ask_who",
+        label:       "问：你是谁",
+        effects:     [{ type: "setFlag", key: "answeredThirdCall", value: true }],
+        nextSceneId: "chapter5_voice_answers"
+      },
+      {
+        id:          "hang_up",
+        label:       "挂断电话",
+        effects:     [{ type: "setFlag", key: "answeredThirdCall", value: true }],
+        nextSceneId: "chapter5_phone_keeps_ringing"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_phone_keeps_ringing",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "电话继续响。\n\n不是普通的铃声——它没有暂停，没有间隔，只是持续的、低沉的震动声。\n\n林夏走到你身边。她说：「不要接。」\n\n监控画面里，旧三号站台的那群人开始移动了。他们朝站台入口的方向走去，走得很慢，但方向很明确。",
+    choices: [
+      {
+        id:          "protect_lin_xia_ring",
+        label:       "保护林夏，不再管它",
+        nextSceneId: "chapter5_protect_lin_xia"
+      },
+      {
+        id:          "answer_after_all",
+        label:       "还是接起来",
+        nextSceneId: "chapter5_third_call"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_phone_unplugged",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你找到电话线，从墙上拔下来。\n\n值班室安静了一秒。\n\n然后铃声从站台广播系统里响起来。一模一样的声音，从你刚刚关掉的那个广播系统里传出来。\n\n控制台上，广播系统的指示灯仍然是灭的。",
+    choices: [
+      {
+        id:          "protect_lin_xia_unplug",
+        label:       "保护林夏",
+        nextSceneId: "chapter5_protect_lin_xia"
+      },
+      {
+        id:          "follow_voice_monitor",
+        label:       "顺着声音查看监控",
+        nextSceneId: "chapter5_voice_answers"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_voice_answers",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你继续等待，或者顺着声音查看监控。\n\n旧三号站台的画面里，一个穿着深色值班制服的人从站台末端走来。制服上有北桥站的标志，但是旧款式的，十年前就改版了。\n\n这个人走路的方式你很熟悉，因为那就是你走路的方式。\n\n那个人停在摄像头正下方，慢慢抬起头。",
+    choices: [
+      {
+        id:          "look_away",
+        label:       "不看那个人的脸，去保护林夏",
+        nextSceneId: "chapter5_protect_lin_xia"
+      },
+      {
+        // Phase 9.1: trust branch — Lin Xia warns the player.
+        // Visible only to players who comforted Lin Xia in Chapter 1.
+        id:          "lin_xia_warns",
+        label:       "（林夏注意到你盯着监控——）",
+        condition:   { type: "flag", key: "comfortedLinXia", operator: "equals", value: true },
+        nextSceneId: "chapter5_lin_xia_trust_warning"
+      },
+      {
+        // Phase 9.1: escalation gate — must have heard own voice first.
+        // Safe exit (look_away) always remains available above.
+        id:          "zoom_in",
+        label:       "放大画面，确认那是谁",
+        condition:   { type: "flag", key: "heardOwnVoice", operator: "equals", value: true },
+        nextSceneId: "chapter5_see_self"
+      }
+    ]
+  },
+
+  // ── Chapter 5: Lin Xia trust warning ─────────────────────────────────────
+  // Phase 9.1: reached from chapter5_voice_answers when comfortedLinXia = true.
+  // Lin Xia notices the player staring and intervenes — high-trust players get a
+  // moment of rescue before the most dangerous choice. Routes to protect_lin_xia.
+  {
+    id:        "chapter5_lin_xia_trust_warning",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "林夏",
+    text:      "林夏注意到你凝视监控的眼神，走到你身边。\n\n她没有问你看到了什么。她只是轻声说：\n\n「别看它。你不是它。」\n\n她的手碰了一下你的手臂，然后站在你旁边。\n\n你把视线从屏幕上移开了。",
+    choices: [
+      {
+        id:          "turn_away",
+        label:       "转过身，不再看",
+        nextSceneId: "chapter5_protect_lin_xia"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_see_self",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你放大了画面。\n\n那个人转过来。\n\n不是模糊的，不是相似，就是你的脸。监控画面比今晚任何时候都要清晰。\n\n那个人开口，值班室的广播同步响起：\n\n「旧三号站台末班列车即将进站。」\n\n林夏在你身后低声说：「不要继续看了。」",
+    choices: [
+      {
+        id:          "cut_monitor",
+        label:       "关掉监控，去保护林夏",
+        nextSceneId: "chapter5_protect_lin_xia"
+      },
+      {
+        id:          "keep_watching",
+        label:       "继续盯着看",
+        nextSceneId: "ending_taken_by_shift"
+      }
+    ]
+  },
+
+  {
+    id:        "chapter5_protect_lin_xia",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "系统",
+    text:      "你把林夏拉离监控台，让她背对屏幕，站在值班室门口。\n\n广播还在响，但你不再操作任何设备。不再查看监控，不再接电话，不再确认任何列车进站。\n\n这是值班室的规矩之一：不能确认的信号，不要回应。\n\n窗外，天色开始有些变化。你不确定是不是快天亮了，还是只是雨停了一会儿。\n\n林夏没有再说话。你们就这样一直等着。",
+    choices: [
+      {
+        id:          "wait_for_dawn",
+        label:       "等到天亮，什么都不再确认",
+        nextSceneId: "ending_true_horror"
+      },
+      {
+        id:          "check_if_crowd_gone",
+        label:       "查看那群人有没有离开站台",
+        nextSceneId: "ending_lin_xia_left_behind"
+      }
+    ]
+  },
+
+  // ── Horror endings ────────────────────────────────────────────────────────
+
+  // Best horror ending. Player refuses the third call and stays with Lin Xia
+  // until dawn. The old platform is not destroyed — only delayed one more night.
+  {
+    id:        "ending_true_horror",
+    chapterId: "ending",
+    type:      "ending",
+    speaker:   "系统",
+    text:      "天亮了。\n\n旧三号站台的监控画面变成了黑屏，和今晚最开始时一样。\n\n广播系统的日志里有最后一条自动生成的记录：\n\n「旧三号站台：末班列车未进站。候客区无人员。等待下次确认。」\n\n下次确认的条件：下一个雨夜。\n\n林夏看了一眼日志，什么也没说。她拿起包，走到值班室门口，推开门。\n\n外面的光是真实的，雨停了。\n\n你坐在椅子上，窗外，北桥站的天空开始有了颜色。",
+    choices:   []
+  },
+
+  // Bad horror ending. Player stares at the other self and is absorbed into the
+  // shift cycle. The next worker finds everything in order — except the handwriting.
+  {
+    id:        "ending_taken_by_shift",
+    chapterId: "ending",
+    type:      "ending",
+    speaker:   "系统",
+    text:      "你没有停下来。\n\n监控里那个人和你对视了很久。\n\n然后一切都安静下来了。广播停了，电话不再响，林夏的声音也消失了——你不确定她什么时候离开的。\n\n次日早班的接班员走进值班室，发现椅子上有人。\n\n交接记录本的最后一行，是今晚的日期，还有一行字：\n\n「值班员已交接，新值班员在岗。」\n\n字迹不是你平时的字迹。但签名是你的名字。\n\n值班室的窗外，雨还在下。",
+    choices:   []
+  },
+
+  // Bad/loop ending. Player breaks from protecting Lin Xia to check the monitor.
+  // She disappears into the old platform. The first call begins again.
+  {
+    id:        "ending_lin_xia_left_behind",
+    chapterId: "ending",
+    type:      "ending",
+    speaker:   "系统",
+    text:      "你打开了监控画面。\n\n旧三号站台上，那群人已经不在了。站台是空的。\n\n然后你看见了一个熟悉的身影。\n\n黑色外套，白色鞋，手里攥着透明袋子。\n\n林夏站在旧三号站台的候车区，面对摄像头，一动不动。\n\n广播响了一声：\n\n「值班员，列车即将进站，请确认候车人数。」\n\n你转身，值班室里只剩你一个人了。\n\n然后值班电话响了。\n\n来电显示：外线\n\n你拿起话筒。那头是一个女生的声音，很慌张。\n\n「你是……北桥站的值班员吗？」",
     choices:   []
   }
 
