@@ -129,3 +129,77 @@ button {
   padding:        20px 0;
   letter-spacing: 0.14em;
 }
+
+/* ── Ending Clue Summary (Phase 4) ──────────────────────────────────────── */
+
+.ending-clue-count {
+  color:          #484848;
+  font-size:      0.82em;
+  text-align:     center;
+  padding:        16px 0 4px;
+  letter-spacing: 0.12em;
+}
+
+.ending-clue-item {
+  color:          #3c3c3c;
+  font-size:      0.80em;
+  text-align:     center;
+  padding:        2px 0;
+  letter-spacing: 0.06em;
+}
+
+/* ── Restart Button (Phase 4) ────────────────────────────────────────────── */
+
+.restart-btn {
+  margin-top:  12px;
+  text-align:  center;
+  align-self:  center;
+  width:       auto;
+  padding:     8px 32px;
+}
+
+/* ── Clue Panel (Phase 4) ────────────────────────────────────────────────── */
+
+#clue-panel {
+  position:         fixed;
+  right:            0;
+  top:              0;
+  width:            196px;
+  height:           100vh;
+  background-color: #0d0d0d;
+  border-left:      1px solid #1a1a1a;
+  padding:          28px 14px;
+  overflow-y:       auto;
+}
+
+#clue-panel-heading {
+  color:          #383838;
+  font-size:      0.72em;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom:  18px;
+}
+
+.clue-item {
+  margin-bottom: 12px;
+  cursor:        pointer;
+}
+
+.clue-title {
+  color:          #707070;
+  font-size:      0.83em;
+  letter-spacing: 0.04em;
+  line-height:    1.4;
+}
+
+.clue-title:hover {
+  color: #b0b0b0;
+}
+
+.clue-desc {
+  color:       #484848;
+  font-size:   0.78em;
+  line-height: 1.55;
+  margin-top:  5px;
+  padding-left: 4px;
+}

@@ -8,21 +8,44 @@
 </head>
 <body>
 
-  <!-- ── Start Screen ──────────────────────────────────── -->
+  <div class="monitor-overlay"></div>
+
   <div id="start-screen">
-    <h1 id="game-title">雨夜值班室</h1>
-    <p  id="game-subtitle">Night Shift Dispatch</p>
-    <p  id="atmosphere-text">雨夜值班室。电话铃响。你接起。</p>
-    <button id="begin-btn">开始值班</button>
+    <div class="terminal-brand">
+      <div class="system-status-tag">STATION SYSTEM v4.02 // ONLINE</div>
+      <h1 id="game-title">雨夜值班室</h1>
+      <p id="game-subtitle">Night Shift Dispatch</p>
+    </div>
+    <p id="atmosphere-text">雨夜值班室。电话铃响。你接起。</p>
+    <button id="begin-btn">开始值班 RUN_SYSTEM</button>
   </div>
 
-  <!-- ── Game Screen (hidden on load) ─────────────────── -->
   <div id="game-screen" style="display:none;">
-    <div id="story-container"></div>
-    <div id="choices-container"></div>
+    <div id="desktop-layout">
+      
+      <main id="console-frame">
+        <header class="console-header">
+          <div class="indicator-group">
+            <span class="status-dot pulsing"></span>
+            <span class="panel-title-text">MAIN MONITOR / 主控制台</span>
+          </div>
+          <div class="system-time-stamp">SYS_LOG_REC: ACTIVE</div>
+        </header>
+
+        <div id="story-container"></div>
+        <div id="choices-container"></div>
+      </main>
+
+      <aside id="clue-panel">
+        <div id="clue-panel-heading">
+          <span class="clue-icon">📊</span> 线索记录 / Clue Log
+        </div>
+        <div id="clue-list"></div>
+      </aside>
+
+    </div>
   </div>
 
-  <!-- Script load order: metadata → scenes → clues → state → effects → conditions → engine → ui → game -->
   <script src="data/metadata.js"></script>
   <script src="data/scenes.js"></script>
   <script src="data/clues.js"></script>
