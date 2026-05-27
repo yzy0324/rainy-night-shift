@@ -56,6 +56,10 @@
 //           zoom_in gated on heardOwnVoice; trust-warning choice added (comfortedLinXia).
 //           New scenes: chapter5_lin_xia_trust_warning, ending_full_truth_complete.
 //           Total scenes: 62.
+// Phase 9.2: trust consequence patch.
+//           chapter5_voice_answers: second high-trust choice (usedCarefulQuestions)
+//           and low-trust choice (pressedTooHard → chapter5_lin_xia_cold_silence).
+//           New scene: chapter5_lin_xia_cold_silence. Total scenes: 63.
 // Choices carry optional effects and condition fields.
 //   effects   — array applied when the choice is selected.
 //   condition — single object; choice hidden if condition returns false.
@@ -1417,17 +1421,33 @@ window.SCENES = [
     text:      "你继续等待，或者顺着声音查看监控。\n\n旧三号站台的画面里，一个穿着深色值班制服的人从站台末端走来。制服上有北桥站的标志，但是旧款式的，十年前就改版了。\n\n这个人走路的方式你很熟悉，因为那就是你走路的方式。\n\n那个人停在摄像头正下方，慢慢抬起头。",
     choices: [
       {
+        // Always visible — unconditional safe exit.
         id:          "look_away",
         label:       "不看那个人的脸，去保护林夏",
         nextSceneId: "chapter5_protect_lin_xia"
       },
       {
-        // Phase 9.1: trust branch — Lin Xia warns the player.
-        // Visible only to players who comforted Lin Xia in Chapter 1.
+        // Phase 9.1: high-trust branch A — player comforted Lin Xia from the start.
         id:          "lin_xia_warns",
         label:       "（林夏注意到你盯着监控——）",
         condition:   { type: "flag", key: "comfortedLinXia", operator: "equals", value: true },
         nextSceneId: "chapter5_lin_xia_trust_warning"
+      },
+      {
+        // Phase 9.2: high-trust branch B — player used careful yes/no questions.
+        // conditions.js has no OR, so this is a separate choice routing to the same scene.
+        id:          "lin_xia_careful",
+        label:       "（林夏认出了你一路引导她的方式——）",
+        condition:   { type: "flag", key: "usedCarefulQuestions", operator: "equals", value: true },
+        nextSceneId: "chapter5_lin_xia_trust_warning"
+      },
+      {
+        // Phase 9.2: low-trust branch — player pressed too hard in Chapter 1.
+        // Lin Xia remembers and does not step in to protect the player this time.
+        id:          "lin_xia_cold",
+        label:       "（林夏看着你，没有走过来——）",
+        condition:   { type: "flag", key: "pressedTooHard", operator: "equals", value: true },
+        nextSceneId: "chapter5_lin_xia_cold_silence"
       },
       {
         // Phase 9.1: escalation gate — must have heard own voice first.
@@ -1455,6 +1475,30 @@ window.SCENES = [
         id:          "turn_away",
         label:       "转过身，不再看",
         nextSceneId: "chapter5_protect_lin_xia"
+      }
+    ]
+  },
+
+  // ── Chapter 5: Lin Xia cold silence ─────────────────────────────────────
+  // Phase 9.2: reached from chapter5_voice_answers when pressedTooHard = true.
+  // Low-trust consequence — Lin Xia remembers being pressed in Chapter 1 and
+  // does not step in to warn the player. The player faces the choice alone.
+  {
+    id:        "chapter5_lin_xia_cold_silence",
+    chapterId: "chapter5",
+    type:      "system",
+    speaker:   "林夏",
+    text:      "林夏看见你盯着监控，停在原地。\n\n她没有走过来。\n\n她记得你们最初通话时的样子——你问的那些问题，那种语气。当时她就知道，你更想弄清楚真相，而不只是帮她。\n\n「你现在也想把真相问清楚，对吗？」\n\n她没有说阻止你，也没有说让你继续。她只是等着你自己决定。",
+    choices: [
+      {
+        id:          "stop_cold",
+        label:       "转过身，去保护林夏",
+        nextSceneId: "chapter5_protect_lin_xia"
+      },
+      {
+        id:          "keep_watching_cold",
+        label:       "继续放大画面",
+        nextSceneId: "chapter5_see_self"
       }
     ]
   },
