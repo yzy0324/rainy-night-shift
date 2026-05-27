@@ -1,5 +1,6 @@
 // ── Condition Checker ─────────────────────────────────────────────────────────
 // Phase 2: evaluates a single condition object against GameState.
+// Phase 4: fixed fallthrough — unknown type/operator now returns false (safe hide).
 // Returns true (show choice) or false (hide choice).
 // No AND/OR nesting — one condition per choice only.
 // No import/export — window global, loaded by plain <script> tag.
@@ -30,8 +31,9 @@ window.Conditions = {
         console.warn("Conditions.check: unknown type —", type);
     }
 
-    // Safe fallback: show the choice if operator/type is unrecognised.
-    return true;
+    // Safe fallback: hide the choice if operator/type is unrecognised.
+    // Phase 4 fix: was incorrectly returning true (show), now returns false (hide).
+    return false;
   }
 
 };

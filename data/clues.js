@@ -1,6 +1,10 @@
 // ── Clue Metadata ─────────────────────────────────────────────────────────────
 // Phase 3: adds clue_static_interference and clue_wrong_number_doubt.
-// No UI panel — clues exist in GameState only, not displayed to the player.
+// Phase 4: clue panel displays collected clues to the player.
+// Phase 5: all three clues are now active — no orphans remain.
+//           clue_static_interference: gates the signal-interference branch in Ch.2.
+//           clue_wrong_number_doubt:  gates the truth-ending path in Ch.2.
+//           clue_lin_xia_hesitation:  gates the hesitation follow-up in Ch.1 (unchanged).
 // No import/export — window global, loaded by plain <script> tag.
 
 window.CLUES = {
