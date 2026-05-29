@@ -22,7 +22,7 @@
 
   <div id="game-screen" style="display:none;">
     <div id="desktop-layout">
-      
+
       <main id="console-frame">
         <header class="console-header">
           <div class="indicator-group">
@@ -38,12 +38,14 @@
 
       <aside id="clue-panel">
         <div id="clue-panel-heading">
-          <span class="clue-icon">📊</span> 线索记录 / Clue Log
+          <span><span class="clue-icon">📊</span> 线索记录 / Clue Log</span>
+          <button id="clue-panel-close" type="button" aria-label="关闭">✕</button>
         </div>
         <div id="clue-list"></div>
       </aside>
 
     </div>
+    <button id="clue-toggle" type="button" aria-expanded="false" aria-controls="clue-panel">线索 0 / 3</button>
   </div>
 
   <script src="data/metadata.js"></script>

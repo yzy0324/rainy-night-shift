@@ -9,6 +9,8 @@
 
 window.UI = {
 
+  _toggleWired: false,
+
   // Entry point called by Engine after every scene load.
   render(scene) {
     this.renderStory(scene.speaker, scene.text);
@@ -95,10 +97,39 @@ window.UI = {
     container.appendChild(restartBtn);
   },
 
+  // Wire the mobile clue-toggle button. Idempotent — runs only once per page load.
+  _wireClueToggle() {
+    if (this._toggleWired) return;
+    const toggleBtn = document.getElementById("clue-toggle");
+    const cluePanel = document.getElementById("clue-panel");
+    if (!toggleBtn || !cluePanel) return;
+    toggleBtn.addEventListener("click", () => {
+      const opening = !cluePanel.classList.contains("is-open");
+      cluePanel.classList.toggle("is-open");
+      toggleBtn.setAttribute("aria-expanded", String(opening));
+    });
+    const closeBtn = document.getElementById("clue-panel-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        cluePanel.classList.remove("is-open");
+        toggleBtn.setAttribute("aria-expanded", "false");
+      });
+    }
+    this._toggleWired = true;
+  },
+
   // Rebuild the clue panel from GameState.clues.
   // Called by Engine.loadScene() on every scene transition.
   // Each clue title is clickable to expand/collapse the description.
   renderClues() {
+    this._wireClueToggle();
+
+    // Keep the floating toggle button text in sync with the current clue count.
+    const toggleBtn = document.getElementById("clue-toggle");
+    if (toggleBtn) {
+      toggleBtn.textContent = "线索 " + GameState.clues.length + " / 3";
+    }
+
     const panel = document.getElementById("clue-list");
     if (!panel) { console.error("UI: #clue-list not found"); return; }
 
