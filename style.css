@@ -204,6 +204,31 @@ button {
   padding-left: 4px;
 }
 
+/* ── Horror Mode (chapter5 + horror endings) ────────────────────────────── */
+/* Subtle phosphor-green tint and scanline texture — "something is wrong",    */
+/* not "the UI is screaming horror". No layout shift. No blocking animation.  */
+
+#game-screen.horror-mode #story-container {
+  color:       #b8c8b0;
+  border-left: 2px solid #1a2a1a;
+  background:  repeating-linear-gradient(
+    to bottom,
+    transparent      0px,
+    transparent      3px,
+    rgba(0,0,0,0.06) 3px,
+    rgba(0,0,0,0.06) 4px
+  );
+}
+
+#game-screen.horror-mode .choice-btn {
+  border-color: #1e2e1e;
+}
+
+#game-screen.horror-mode .choice-btn:hover {
+  border-color: #3a5a3a;
+  color:        #d8e8d0;
+}
+
 /* ── Clue Toggle + Close (hidden on desktop) ─────────────────────────────── */
 
 #clue-toggle {

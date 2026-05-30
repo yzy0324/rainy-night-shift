@@ -9,12 +9,27 @@
 
 window.UI = {
 
-  _toggleWired: false,
+  _toggleWired:  false,
+  _currentScene: null,
 
   // Entry point called by Engine after every scene load.
   render(scene) {
+    this._currentScene = scene;
+    this._setHorrorMode(scene);
     this.renderStory(scene.speaker, scene.text);
     this.renderChoices(scene.choices);
+  },
+
+  // Apply or remove the horror-mode class on #game-screen.
+  // Called on every scene load — guarantees clean removal when normal scenes reload after restart.
+  _setHorrorMode(scene) {
+    const screen = document.getElementById("game-screen");
+    if (!screen) return;
+    const isHorror = scene.chapterId === "chapter5"           ||
+                     scene.id === "ending_true_horror"         ||
+                     scene.id === "ending_taken_by_shift"      ||
+                     scene.id === "ending_lin_xia_left_behind";
+    screen.classList.toggle("horror-mode", isHorror);
   },
 
   // Write speaker + text to the story panel.
@@ -87,9 +102,11 @@ window.UI = {
     container.appendChild(sep);
 
     // ── Restart button ──
+    const horrorEndingIds  = ["ending_true_horror", "ending_taken_by_shift", "ending_lin_xia_left_behind"];
+    const isHorrorEnding   = this._currentScene && horrorEndingIds.indexOf(this._currentScene.id) !== -1;
     const restartBtn = document.createElement("button");
     restartBtn.className   = "choice-btn restart-btn";
-    restartBtn.textContent = "重置系统 RESTART";
+    restartBtn.textContent = isHorrorEnding ? "重新接班 RESET_SHIFT" : "重置系统 RESTART";
     restartBtn.addEventListener("click", () => {
       // Re-initialise engine with the same globals — game screen stays visible.
       Engine.init(METADATA, SCENES, UI, CLUES);

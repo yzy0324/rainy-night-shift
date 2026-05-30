@@ -9,12 +9,14 @@
 // Phase 9:   Chapter 5 horror layer added (16 new scenes); version bumped to 0.9.0.
 // Phase 9.1: flag activation + evidence quality + horror escalation gate; version bumped to 0.9.1.
 // Phase 9.2: trust consequence patch — usedCarefulQuestions and pressedTooHard now active; version bumped to 0.9.2.
+// Phase 9.3: player-guidance patch — removed clue_wrong_number_doubt gate from chapter2_final_choice; version bumped to 0.9.3.
+// v1.0:    horror presentation polish — horror-mode visual class, restart button text, Ch.0 atmospheric line.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.METADATA = {
   gameId:      "night-shift-dispatch",
   title:       "雨夜值班室 / Night Shift Dispatch",
-  version:     "0.9.2",
+  version:     "1.0.0",
   startSceneId: "chapter0_arrival"
 };
 

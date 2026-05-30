@@ -90,7 +90,7 @@ window.SCENES = [
     chapterId: "chapter0",
     type:      "system",
     speaker:   "系统",
-    text:      "你坐到旧转椅上，按下显示器电源。屏幕闪烁着亮起，一串字符快速滚动。系统加载完毕。",
+    text:      "你坐到旧转椅上，按下显示器电源。屏幕闪烁着亮起，一串字符快速滚动。系统加载完毕。\n\n每一条电话记录都会被存档。",
     choices: [
       {
         id:          "start_shift",
@@ -417,9 +417,9 @@ window.SCENES = [
   },
 
   // ── Chapter 2: final decision ─────────────────────────────────────────────
-  // All Chapter 2 paths converge here. Filing the anomaly report requires
-  // clue_wrong_number_doubt — the player must have questioned the phone number
-  // back in Chapter 1. Without it, only the quiet exit is available.
+  // All Chapter 2 paths converge here. Both choices are always visible.
+  // Phase 9.3: keep both Chapter 2 resolution choices visible to guide players
+  // into either ending the shift or continuing the investigation.
   {
     id:        "chapter2_final_choice",
     chapterId: "chapter2",
@@ -428,18 +428,12 @@ window.SCENES = [
     text:      "我把我知道的都告诉你了。你觉得……今晚的事，只是一场误会吗？",
     choices: [
       {
-        id:          "file_report",
+        id:          "report_abnormal_event",
         label:       "不是误会。我要提交异常事件报告。",
-        nextSceneId: "ending_truth_uncovered",
-        condition: {
-          type:     "clue",
-          key:      "clue_wrong_number_doubt",
-          operator: "includes",
-          value:    true
-        }
+        nextSceneId: "ending_truth_uncovered"
       },
       {
-        id:          "end_shift",
+        id:          "end_shift_as_uncertain",
         label:       "也许是，也许不是。值班结束了。",
         nextSceneId: "ending_loose_ends"
       }
@@ -1164,7 +1158,7 @@ window.SCENES = [
   },
 
   // ── Ending: loose ends ────────────────────────────────────────────────────
-  // Reached by players who missed clue_wrong_number_doubt or chose to let go.
+  // Reached by players who choose to end the shift instead of filing an abnormal event report.
   // Something lingers, but without the key clue it cannot be named.
   {
     id:        "ending_loose_ends",
