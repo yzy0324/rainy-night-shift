@@ -148,6 +148,18 @@ button {
   letter-spacing: 0.06em;
 }
 
+/* ── Post-ending Atmospheric Hint ───────────────────────────────────────── */
+
+.ending-hint {
+  color:          #2c2c2c;
+  font-size:      0.76em;
+  text-align:     center;
+  padding:        12px 0 8px;
+  margin-top:     6px;
+  letter-spacing: 0.08em;
+  border-top:     1px solid #131313;
+}
+
 /* ── Restart Button (Phase 4) ────────────────────────────────────────────── */
 
 .restart-btn {
@@ -218,6 +230,11 @@ button {
     rgba(0,0,0,0.06) 3px,
     rgba(0,0,0,0.06) 4px
   );
+}
+
+#game-screen.horror-mode .ending-hint {
+  color:        #252e25;
+  border-color: #0e160e;
 }
 
 #game-screen.horror-mode .choice-btn {

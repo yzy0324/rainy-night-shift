@@ -1,16 +1,17 @@
-// ── Canonical Integrity Check — v1.1.0 ───────────────────────────────────
+// ── Canonical Integrity Check — v1.1.1 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
 //   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.1.0, startSceneId resolves
+//   2. Metadata               — version 1.1.1, startSceneId resolves
 //   3. Scene count & endings  — count 63, all ending-type scenes terminal
 //   4. Required endings       — 10 endings present and reachable
 //   5. Chapter 5 scenes       — all 14 scenes present
 //   6. Clue system            — count 3, all addClue keys resolve
 //   7. Game-logic invariants  — phase-critical conditions preserved
 //   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve
+//   9. Ending hints           — 10 hints, non-empty, no spoiler keywords
 
 const fs   = require("fs");
 const path = require("path");
@@ -97,8 +98,8 @@ else pass("no trailing whitespace in scenes.js");
 // ═════════════════════════════════════════════════════════════════════════
 section("2. Metadata");
 
-if (meta.version !== "1.1.0")
-  fail("version expected 1.1.0, got " + meta.version);
+if (meta.version !== "1.1.1")
+  fail("version expected 1.1.1, got " + meta.version);
 else
   pass("version " + meta.version);
 
@@ -310,6 +311,66 @@ try {
   }
 } catch (e) {
   fail("failed to load src/archive.js: " + e.message);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+section("9. Ending hints");
+
+try {
+  global.window = {};
+  require(path.join(root, "data", "endingHints.js"));
+  const ENDING_HINTS = global.window.ENDING_HINTS;
+
+  if (!ENDING_HINTS || typeof ENDING_HINTS !== "object" || Array.isArray(ENDING_HINTS)) {
+    fail("ENDING_HINTS not found or wrong type in data/endingHints.js");
+  } else {
+    const hintKeys = Object.keys(ENDING_HINTS);
+
+    // Count
+    if (hintKeys.length !== 10)
+      fail("hint count " + hintKeys.length + " (expected 10)");
+    else
+      pass("hint count " + hintKeys.length);
+
+    // Every required ending has a hint
+    let missingHints = 0;
+    REQUIRED_ENDINGS.forEach(id => {
+      if (!ENDING_HINTS[id]) { fail("no hint for required ending: " + id); missingHints++; }
+    });
+    if (missingHints === 0) pass("all required endings have hints");
+
+    // Every hint key must resolve to a known scene
+    let badHintKeys = 0;
+    hintKeys.forEach(id => {
+      if (!map[id]) { fail("hint key not a scene: " + id); badHintKeys++; }
+    });
+    if (badHintKeys === 0) pass("all hint keys resolve to scenes");
+
+    // All hints are non-empty strings
+    let emptyHints = 0;
+    hintKeys.forEach(id => {
+      if (typeof ENDING_HINTS[id] !== "string" || ENDING_HINTS[id].trim() === "") {
+        fail("empty or non-string hint for: " + id);
+        emptyHints++;
+      }
+    });
+    if (emptyHints === 0) pass("all hints are non-empty strings");
+
+    // No hint contains spoiler / route-revealing keywords
+    const forbidden = ["选择", "flag", "condition", "解锁方式"];
+    let spoilerCount = 0;
+    hintKeys.forEach(id => {
+      forbidden.forEach(word => {
+        if (ENDING_HINTS[id].indexOf(word) !== -1) {
+          fail("hint for '" + id + "' contains forbidden word: '" + word + "'");
+          spoilerCount++;
+        }
+      });
+    });
+    if (spoilerCount === 0) pass("no hints contain spoiler keywords");
+  }
+} catch (e) {
+  fail("failed to load data/endingHints.js: " + e.message);
 }
 
 // ═════════════════════════════════════════════════════════════════════════

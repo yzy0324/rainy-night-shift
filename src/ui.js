@@ -107,6 +107,18 @@ window.UI = {
     sep.textContent = "— 信号中断 / 值班结束 —";
     container.appendChild(sep);
 
+    // ── Atmospheric hint ──
+    // One system-log line per ending — non-spoiler, cold, station-record tone.
+    const hintText = (typeof ENDING_HINTS !== "undefined") &&
+                     this._currentScene &&
+                     ENDING_HINTS[this._currentScene.id];
+    if (hintText) {
+      const hintEl = document.createElement("p");
+      hintEl.className   = "ending-hint";
+      hintEl.textContent = hintText;
+      container.appendChild(hintEl);
+    }
+
     // ── Restart button ──
     const horrorEndingIds  = ["ending_true_horror", "ending_taken_by_shift", "ending_lin_xia_left_behind"];
     const isHorrorEnding   = this._currentScene && horrorEndingIds.indexOf(this._currentScene.id) !== -1;

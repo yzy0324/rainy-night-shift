@@ -12,12 +12,13 @@
 // Phase 9.3: player-guidance patch — removed clue_wrong_number_doubt gate from chapter2_final_choice; version bumped to 0.9.3.
 // v1.0:    horror presentation polish — horror-mode visual class, restart button text, Ch.0 atmospheric line.
 // v1.1:    ending archive — localStorage-backed ending collection with in-memory fallback.
+// v1.1.1:  post-ending atmospheric hints — one system-log line per ending.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.METADATA = {
   gameId:      "night-shift-dispatch",
   title:       "雨夜值班室 / Night Shift Dispatch",
-  version:     "1.1.0",
+  version:     "1.1.1",
   startSceneId: "chapter0_arrival"
 };
 
