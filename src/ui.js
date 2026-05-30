@@ -221,6 +221,33 @@ window.UI = {
     if (overlay) overlay.style.display = "none";
   },
 
+  // Apply second-run horror-memory state to the start screen.
+  // Called once at UI boot. Cosmetic only — does not touch click handlers or
+  // game logic. Safe no-op if Archive is unavailable or no horror ending has
+  // been reached. Persists automatically because it reads from existing
+  // Archive / localStorage data; no new storage key is introduced.
+  _initStartScreen() {
+    if (typeof Archive === "undefined") return;
+    const horrorIds = [
+      "ending_taken_by_shift",
+      "ending_lin_xia_left_behind",
+      "ending_true_horror"
+    ];
+    if (!Archive.hasAnyUnlocked(horrorIds)) return;
+
+    const screen = document.getElementById("start-screen");
+    if (screen) screen.classList.add("has-horror-memory");
+
+    const tag = document.querySelector(".system-status-tag");
+    if (tag) tag.textContent = "STATION SYSTEM v4.02 // SHIFT ON RECORD";
+
+    const atm = document.getElementById("atmosphere-text");
+    if (atm) atm.textContent = "又是这里。电话会响的。";
+
+    const btn = document.getElementById("begin-btn");
+    if (btn) btn.textContent = "重新接班 RUN_SYSTEM";
+  },
+
   // Wire the mobile clue-toggle button. Idempotent — runs only once per page load.
   _wireClueToggle() {
     if (this._toggleWired) return;
@@ -300,5 +327,6 @@ window.UI = {
 // work before Engine.init() is ever called. _wireArchiveControls is idempotent,
 // so the later call from renderClues() is a safe no-op.
 UI._wireArchiveControls();
+UI._initStartScreen();
 
 console.log("ui loaded");

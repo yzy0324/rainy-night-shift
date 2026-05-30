@@ -136,12 +136,19 @@ window.Archive = (function () {
     return _getUnlocked().filter(function (id) { return _knownIds[id]; }).length;
   }
 
+  // Return true if any ID in the given array has been unlocked.
+  // Unknown IDs return false through isUnlocked. Safe on empty input.
+  function hasAnyUnlocked(ids) {
+    return ids.some(function (id) { return isUnlocked(id); });
+  }
+
   return {
     ENDING_CATALOGUE: ENDING_CATALOGUE,
     unlock:           unlock,
     isUnlocked:       isUnlocked,
     getAll:           getAll,
-    getCount:         getCount
+    getCount:         getCount,
+    hasAnyUnlocked:   hasAnyUnlocked
   };
 
 }());

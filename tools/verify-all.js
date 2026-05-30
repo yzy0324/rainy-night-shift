@@ -1,16 +1,17 @@
-// ── Canonical Integrity Check — v1.1.1 ───────────────────────────────────
+// ── Canonical Integrity Check — v1.2.0 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
 //   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.1.1, startSceneId resolves
+//   2. Metadata               — version 1.2.0, startSceneId resolves
 //   3. Scene count & endings  — count 63, all ending-type scenes terminal
 //   4. Required endings       — 10 endings present and reachable
 //   5. Chapter 5 scenes       — all 14 scenes present
 //   6. Clue system            — count 3, all addClue keys resolve
 //   7. Game-logic invariants  — phase-critical conditions preserved
-//   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve
+//   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve,
+//                               hasAnyUnlocked is a function
 //   9. Ending hints           — 10 hints, non-empty, no spoiler keywords
 
 const fs   = require("fs");
@@ -98,8 +99,8 @@ else pass("no trailing whitespace in scenes.js");
 // ═════════════════════════════════════════════════════════════════════════
 section("2. Metadata");
 
-if (meta.version !== "1.1.1")
-  fail("version expected 1.1.1, got " + meta.version);
+if (meta.version !== "1.2.0")
+  fail("version expected 1.2.0, got " + meta.version);
 else
   pass("version " + meta.version);
 
@@ -308,6 +309,12 @@ try {
       }
     });
     if (catUnreachable === 0) pass("all catalogue endings are reachable");
+
+    // Archive.hasAnyUnlocked must be a function (v1.2.0)
+    if (typeof Archive.hasAnyUnlocked !== "function")
+      fail("Archive.hasAnyUnlocked is not a function");
+    else
+      pass("Archive.hasAnyUnlocked is a function");
   }
 } catch (e) {
   fail("failed to load src/archive.js: " + e.message);

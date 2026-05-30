@@ -246,6 +246,22 @@ button {
   color:        #d8e8d0;
 }
 
+/* ── Second-run horror memory (start screen) ─────────────────────────────── */
+/* Applied when any horror ending has been unlocked. Changes are cosmetic:    */
+/* a barely-perceptible title tint and a green-tinged begin-button border.    */
+
+#start-screen.has-horror-memory #game-title {
+  color: #d8d8d0;
+}
+
+#start-screen.has-horror-memory #begin-btn {
+  border-color: #1e2e1e;
+}
+
+#start-screen.has-horror-memory #begin-btn:hover {
+  border-color: #3a5a3a;
+}
+
 /* ── Archive open button (start screen, low visual weight) ──────────────── */
 
 #archive-open-btn {
