@@ -18,12 +18,13 @@
 //          conditional Ch.2 choice, new chapter2_chen_under_pressure scene.
 // v1.4.0:  Chen / Van Evidence Payoff — connectedVanToChen now gates a second
 //          route to ending_full_truth_complete via chapter4_chen_van_evidence_note.
+// v1.4.1:  mobile archive close fix.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.METADATA = {
   gameId:      "night-shift-dispatch",
   title:       "雨夜值班室 / Night Shift Dispatch",
-  version:     "1.4.0",
+  version:     "1.4.1",
   startSceneId: "chapter0_arrival"
 };
 

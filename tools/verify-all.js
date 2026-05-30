@@ -1,10 +1,10 @@
-// ── Canonical Integrity Check — v1.4.0 ───────────────────────────────────
+// ── Canonical Integrity Check — v1.4.1 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
 //   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.4.0, startSceneId resolves
+//   2. Metadata               — version 1.4.1, startSceneId resolves
 //   3. Scene count & endings  — count 65, all ending-type scenes terminal
 //   4. Required endings       — 10 endings present and reachable
 //   5. Chapter 5 scenes       — all 14 scenes present
@@ -101,8 +101,8 @@ else pass("no trailing whitespace in scenes.js");
 // ═════════════════════════════════════════════════════════════════════════
 section("2. Metadata");
 
-if (meta.version !== "1.4.0")
-  fail("version expected 1.4.0, got " + meta.version);
+if (meta.version !== "1.4.1")
+  fail("version expected 1.4.1, got " + meta.version);
 else
   pass("version " + meta.version);
 

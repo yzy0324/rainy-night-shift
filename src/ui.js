@@ -146,13 +146,18 @@ window.UI = {
     if (this._archiveWired) return;
     const openBtn  = document.getElementById("archive-open-btn");
     const closeBtn = document.getElementById("archive-close");
-    if (!openBtn || !closeBtn) return;
+    const overlay  = document.getElementById("archive-overlay");
+    const panel    = document.getElementById("archive-panel");
+    if (!openBtn || !closeBtn || !overlay || !panel) return;
     openBtn.addEventListener("click",  () => { this.showArchive(); });
     closeBtn.addEventListener("click", () => { this.hideArchive(); });
+    // Tap/click on backdrop closes archive.
+    overlay.addEventListener("click", () => { this.hideArchive(); });
+    // Tap/click inside panel should not bubble to backdrop close handler.
+    panel.addEventListener("click", e => { e.stopPropagation(); });
     // Escape key closes the overlay when it is visible.
     document.addEventListener("keydown", e => {
       if (e.key !== "Escape") return;
-      const overlay = document.getElementById("archive-overlay");
       if (overlay && overlay.style.display !== "none") this.hideArchive();
     });
     this._archiveWired = true;

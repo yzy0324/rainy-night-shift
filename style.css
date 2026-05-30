@@ -308,7 +308,7 @@ button {
   position:        fixed;
   inset:           0;
   background:      rgba(0, 0, 0, 0.84);
-  z-index:         300;
+  z-index:         400;
   align-items:     center;
   justify-content: center;
   padding:         24px;
@@ -361,9 +361,11 @@ button {
   border:         none;
   color:          #404040;
   font-family:    "Courier New", Consolas, "Lucida Console", monospace;
-  font-size:      1em;
+  font-size:      1.1em;
   cursor:         pointer;
-  padding:        2px 4px;
+  min-width:      44px;
+  min-height:     44px;
+  padding:        0;
   line-height:    1;
   flex-shrink:    0;
 }
@@ -512,9 +514,19 @@ button {
   }
 
   #archive-panel {
-    max-width:  100%;
-    max-height: 82vh;
+    max-width:    100%;
+    width:        100%;
+    max-height:   85vh;
+    overflow-y:   auto;
+    overflow-x:   hidden;
     border-bottom: none;
+  }
+
+  #archive-header {
+    position:   sticky;
+    top:        0;
+    z-index:    1;
+    background: #0d0d0d;
   }
 
   /* ── Floating toggle button ── */
