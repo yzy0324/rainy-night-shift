@@ -11,6 +11,7 @@ window.UI = {
 
   _toggleWired:  false,
   _currentScene: null,
+  _archiveWired: false,
 
   // Entry point called by Engine after every scene load.
   render(scene) {
@@ -72,6 +73,11 @@ window.UI = {
   // Replace the choices area with ending info: clue count, clue list, restart.
   // All text set via textContent — no innerHTML for any dynamic content.
   showEnding() {
+    // Record this ending in the archive before touching the DOM.
+    if (typeof Archive !== "undefined" && this._currentScene) {
+      Archive.unlock(this._currentScene.id);
+    }
+
     const container = document.getElementById("choices-container");
     if (!container) { console.error("UI: #choices-container not found"); return; }
     container.innerHTML = "";
@@ -112,6 +118,95 @@ window.UI = {
       Engine.init(METADATA, SCENES, UI, CLUES);
     });
     container.appendChild(restartBtn);
+
+    // ── Archive link ──
+    const archiveBtn = document.createElement("button");
+    archiveBtn.className   = "choice-btn archive-btn";
+    archiveBtn.textContent = "[ 档案记录 RECORDS ]";
+    archiveBtn.addEventListener("click", () => { this.showArchive(); });
+    container.appendChild(archiveBtn);
+  },
+
+  // ── Archive ───────────────────────────────────────────────────────────────
+
+  // Wire the static archive controls. Idempotent — runs only once per page load.
+  _wireArchiveControls() {
+    if (this._archiveWired) return;
+    const openBtn  = document.getElementById("archive-open-btn");
+    const closeBtn = document.getElementById("archive-close");
+    if (!openBtn || !closeBtn) return;
+    openBtn.addEventListener("click",  () => { this.showArchive(); });
+    closeBtn.addEventListener("click", () => { this.hideArchive(); });
+    // Escape key closes the overlay when it is visible.
+    document.addEventListener("keydown", e => {
+      if (e.key !== "Escape") return;
+      const overlay = document.getElementById("archive-overlay");
+      if (overlay && overlay.style.display !== "none") this.hideArchive();
+    });
+    this._archiveWired = true;
+  },
+
+  // Populate #archive-list and update #archive-count from Archive data.
+  renderArchive() {
+    const list  = document.getElementById("archive-list");
+    const count = document.getElementById("archive-count");
+    if (!list || !count) return;
+
+    const unlockCount = (typeof Archive !== "undefined") ? Archive.getCount() : 0;
+    count.textContent = "已记录 / RECORDS: " + unlockCount + " / 10";
+
+    while (list.firstChild) { list.removeChild(list.firstChild); }
+
+    const entries = (typeof Archive !== "undefined") ? Archive.getAll() : [];
+    entries.forEach(entry => {
+      const row = document.createElement("div");
+      row.className = "archive-entry " + (entry.unlocked ? "is-unlocked" : "is-locked");
+
+      const dot = document.createElement("span");
+      dot.className   = "archive-indicator";
+      dot.textContent = entry.unlocked ? "●" : "○";
+
+      const body = document.createElement("div");
+      body.className = "archive-entry-body";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "archive-entry-title";
+
+      if (entry.unlocked) {
+        titleEl.textContent = entry.title;
+        const descEl = document.createElement("p");
+        descEl.className   = "archive-entry-desc";
+        descEl.textContent = entry.description;
+        body.appendChild(titleEl);
+        body.appendChild(descEl);
+      } else {
+        titleEl.textContent = "─ ─ ─ ─ ─ ─ ─ ─ ─ ─  [SEALED]";
+        body.appendChild(titleEl);
+      }
+
+      row.appendChild(dot);
+      row.appendChild(body);
+      list.appendChild(row);
+    });
+  },
+
+  // Open the archive overlay, closing the mobile clue drawer first if open.
+  showArchive() {
+    const cluePanel  = document.getElementById("clue-panel");
+    const clueToggle = document.getElementById("clue-toggle");
+    if (cluePanel && cluePanel.classList.contains("is-open")) {
+      cluePanel.classList.remove("is-open");
+      if (clueToggle) clueToggle.setAttribute("aria-expanded", "false");
+    }
+    this.renderArchive();
+    const overlay = document.getElementById("archive-overlay");
+    if (overlay) overlay.style.display = "flex";
+  },
+
+  // Close the archive overlay.
+  hideArchive() {
+    const overlay = document.getElementById("archive-overlay");
+    if (overlay) overlay.style.display = "none";
   },
 
   // Wire the mobile clue-toggle button. Idempotent — runs only once per page load.
@@ -140,6 +235,7 @@ window.UI = {
   // Each clue title is clickable to expand/collapse the description.
   renderClues() {
     this._wireClueToggle();
+    this._wireArchiveControls();
 
     // Keep the floating toggle button text in sync with the current clue count.
     const toggleBtn = document.getElementById("clue-toggle");
@@ -187,5 +283,10 @@ window.UI = {
   }
 
 };
+
+// Wire static archive controls immediately — the start-screen open button must
+// work before Engine.init() is ever called. _wireArchiveControls is idempotent,
+// so the later call from renderClues() is a safe no-op.
+UI._wireArchiveControls();
 
 console.log("ui loaded");

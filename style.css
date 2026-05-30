@@ -229,6 +229,169 @@ button {
   color:        #d8e8d0;
 }
 
+/* ── Archive open button (start screen, low visual weight) ──────────────── */
+
+#archive-open-btn {
+  display:        block;
+  width:          100%;
+  background:     transparent;
+  border:         none;
+  color:          #303030;
+  font-family:    "Courier New", Consolas, "Lucida Console", monospace;
+  font-size:      0.78em;
+  letter-spacing: 0.18em;
+  cursor:         pointer;
+  padding:        8px 0;
+  margin-top:     14px;
+  text-align:     center;
+}
+
+#archive-open-btn:hover {
+  color: #646464;
+}
+
+/* ── Archive button on ending screen ─────────────────────────────────────── */
+
+.archive-btn {
+  margin-top:   6px;
+  text-align:   center;
+  align-self:   center;
+  width:        auto;
+  padding:      6px 28px;
+  color:        #3a3a3a;
+  border-color: #1c1c1c;
+  font-size:    0.85em;
+}
+
+.archive-btn:hover {
+  color:        #808080;
+  border-color: #383838;
+}
+
+/* ── Archive overlay — full-screen backdrop ──────────────────────────────── */
+
+#archive-overlay {
+  display:         none;       /* JS sets to "flex" when open */
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0, 0, 0, 0.84);
+  z-index:         300;
+  align-items:     center;
+  justify-content: center;
+  padding:         24px;
+}
+
+/* ── Archive panel — the inner card ──────────────────────────────────────── */
+
+#archive-panel {
+  background-color: #0d0d0d;
+  border:           1px solid #252525;
+  max-width:        520px;
+  width:            100%;
+  max-height:       80vh;
+  display:          flex;
+  flex-direction:   column;
+  overflow:         hidden;
+}
+
+/* ── Archive header ──────────────────────────────────────────────────────── */
+
+#archive-header {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  padding:         18px 20px 14px;
+  border-bottom:   1px solid #1a1a1a;
+  flex-shrink:     0;
+  gap:             8px;
+}
+
+#archive-title {
+  color:          #303030;
+  font-size:      0.72em;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  flex-shrink:    0;
+}
+
+#archive-count {
+  color:          #3a3a3a;
+  font-size:      0.72em;
+  letter-spacing: 0.12em;
+  flex:           1;
+  text-align:     right;
+  white-space:    nowrap;
+}
+
+#archive-close {
+  background:     transparent;
+  border:         none;
+  color:          #404040;
+  font-family:    "Courier New", Consolas, "Lucida Console", monospace;
+  font-size:      1em;
+  cursor:         pointer;
+  padding:        2px 4px;
+  line-height:    1;
+  flex-shrink:    0;
+}
+
+#archive-close:hover {
+  color: #909090;
+}
+
+/* ── Archive entry list ──────────────────────────────────────────────────── */
+
+#archive-list {
+  overflow-y: auto;
+  padding:    10px 20px 20px;
+}
+
+.archive-entry {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           12px;
+  padding:       10px 0;
+  border-bottom: 1px solid #121212;
+}
+
+.archive-entry:last-child {
+  border-bottom: none;
+}
+
+.archive-indicator {
+  font-size:   0.82em;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.archive-entry.is-unlocked .archive-indicator { color: #505050; }
+.archive-entry.is-locked   .archive-indicator { color: #242424; }
+
+.archive-entry-body {
+  flex:      1;
+  min-width: 0;
+}
+
+.archive-entry.is-unlocked .archive-entry-title {
+  color:          #888888;
+  font-size:      0.88em;
+  letter-spacing: 0.06em;
+  line-height:    1.4;
+}
+
+.archive-entry.is-locked .archive-entry-title {
+  color:          #242424;
+  font-size:      0.80em;
+  letter-spacing: 0.14em;
+}
+
+.archive-entry-desc {
+  color:       #424242;
+  font-size:   0.78em;
+  line-height: 1.5;
+  margin-top:  4px;
+}
+
 /* ── Clue Toggle + Close (hidden on desktop) ─────────────────────────────── */
 
 #clue-toggle {
@@ -307,6 +470,18 @@ button {
 
   #clue-list {
     overflow-y: auto;
+  }
+
+  /* ── Archive overlay: slide up from bottom on mobile ── */
+  #archive-overlay {
+    padding:     0;
+    align-items: flex-end;
+  }
+
+  #archive-panel {
+    max-width:  100%;
+    max-height: 82vh;
+    border-bottom: none;
   }
 
   /* ── Floating toggle button ── */

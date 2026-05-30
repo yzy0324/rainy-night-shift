@@ -1,15 +1,16 @@
-// ── Canonical Integrity Check — v1.0.0 ───────────────────────────────────
+// ── Canonical Integrity Check — v1.1.0 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
 //   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.0.0, startSceneId resolves
+//   2. Metadata               — version 1.1.0, startSceneId resolves
 //   3. Scene count & endings  — count 63, all ending-type scenes terminal
 //   4. Required endings       — 10 endings present and reachable
 //   5. Chapter 5 scenes       — all 14 scenes present
 //   6. Clue system            — count 3, all addClue keys resolve
 //   7. Game-logic invariants  — phase-critical conditions preserved
+//   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve
 
 const fs   = require("fs");
 const path = require("path");
@@ -96,8 +97,8 @@ else pass("no trailing whitespace in scenes.js");
 // ═════════════════════════════════════════════════════════════════════════
 section("2. Metadata");
 
-if (meta.version !== "1.0.0")
-  fail("version expected 1.0.0, got " + meta.version);
+if (meta.version !== "1.1.0")
+  fail("version expected 1.1.0, got " + meta.version);
 else
   pass("version " + meta.version);
 
@@ -252,6 +253,64 @@ if (!ftcGated)
   fail("ending_full_truth_complete not gated on jammerEvidenceSaved");
 else
   pass("ending_full_truth_complete gated on jammerEvidenceSaved");
+
+// ═════════════════════════════════════════════════════════════════════════
+section("8. Archive catalogue");
+
+try {
+  global.window = {};
+  require(path.join(root, "src", "archive.js"));
+  const Archive = global.window.Archive;
+
+  if (!Archive || !Array.isArray(Archive.ENDING_CATALOGUE)) {
+    fail("Archive.ENDING_CATALOGUE not found — check src/archive.js");
+  } else {
+    const cat = Archive.ENDING_CATALOGUE;
+
+    // Length
+    if (cat.length !== 10)
+      fail("catalogue length " + cat.length + " (expected 10)");
+    else
+      pass("catalogue length " + cat.length);
+
+    // No duplicate IDs
+    const catSeen = {};
+    let catDupes = 0;
+    cat.forEach(e => {
+      if (catSeen[e.id]) { fail("duplicate catalogue ID: " + e.id); catDupes++; }
+      else catSeen[e.id] = true;
+    });
+    if (catDupes === 0) pass("no duplicate catalogue IDs");
+
+    // Every catalogue ID must exist as a scene
+    let catMissing = 0;
+    cat.forEach(e => {
+      if (!map[e.id]) { fail("catalogue ID not found in scenes: " + e.id); catMissing++; }
+    });
+    if (catMissing === 0) pass("all catalogue IDs resolve to scenes");
+
+    // Every required ending must appear in the catalogue
+    const catIds = {};
+    cat.forEach(e => { catIds[e.id] = true; });
+    let reqMissing = 0;
+    REQUIRED_ENDINGS.forEach(id => {
+      if (!catIds[id]) { fail("required ending absent from catalogue: " + id); reqMissing++; }
+    });
+    if (reqMissing === 0) pass("all required endings present in catalogue");
+
+    // Every catalogue ending must have at least one incoming link
+    let catUnreachable = 0;
+    cat.forEach(e => {
+      if (!reachable.has(e.id)) {
+        fail("catalogue ending unreachable: " + e.id);
+        catUnreachable++;
+      }
+    });
+    if (catUnreachable === 0) pass("all catalogue endings are reachable");
+  }
+} catch (e) {
+  fail("failed to load src/archive.js: " + e.message);
+}
 
 // ═════════════════════════════════════════════════════════════════════════
 console.log("");

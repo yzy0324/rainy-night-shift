@@ -18,6 +18,7 @@
     </div>
     <p id="atmosphere-text">雨夜值班室。电话铃响。你接起。</p>
     <button id="begin-btn">开始值班 RUN_SYSTEM</button>
+    <button id="archive-open-btn" type="button">[ 档案记录 RECORDS ]</button>
   </div>
 
   <div id="game-screen" style="display:none;">
@@ -48,6 +49,17 @@
     <button id="clue-toggle" type="button" aria-expanded="false" aria-controls="clue-panel">线索 0 / 3</button>
   </div>
 
+  <div id="archive-overlay" role="dialog" aria-modal="true" aria-labelledby="archive-title" style="display:none;">
+    <div id="archive-panel">
+      <div id="archive-header">
+        <span id="archive-title">值班档案 / SHIFT RECORDS</span>
+        <span id="archive-count">已记录 0 / 10</span>
+        <button id="archive-close" type="button" aria-label="关闭档案">✕</button>
+      </div>
+      <div id="archive-list"></div>
+    </div>
+  </div>
+
   <script src="data/metadata.js"></script>
   <script src="data/scenes.js"></script>
   <script src="data/clues.js"></script>
@@ -55,6 +67,7 @@
   <script src="src/effects.js"></script>
   <script src="src/conditions.js"></script>
   <script src="src/engine.js"></script>
+  <script src="src/archive.js"></script>
   <script src="src/ui.js"></script>
   <script src="game.js"></script>
 
