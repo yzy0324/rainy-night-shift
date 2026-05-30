@@ -1,20 +1,20 @@
-// ── Canonical Integrity Check — v1.4.1 ───────────────────────────────────
+// ── Canonical Integrity Check �?v1.5.0 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
-//   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
+//   1. Structural integrity   �?broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.4.1, startSceneId resolves
-//   3. Scene count & endings  — count 65, all ending-type scenes terminal
-//   4. Required endings       — 10 endings present and reachable
-//   5. Chapter 5 scenes       — all 14 scenes present
-//   6. Clue system            — count 3, all addClue keys resolve
-//   7. Game-logic invariants  — phase-critical conditions preserved
-//   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve,
+//   2. Metadata               �?version 1.5.0, startSceneId resolves
+//   3. Scene count & endings  �?count 65, all ending-type scenes terminal
+//   4. Required endings       �?10 endings present and reachable
+//   5. Chapter 5 scenes       �?all 14 scenes present
+//   6. Clue system            �?count 3, all addClue keys resolve
+//   7. Game-logic invariants  �?phase-critical conditions preserved
+//   8. Archive catalogue      �?10 entries, no dupes, all IDs resolve,
 //                               hasAnyUnlocked is a function
-//   9. Ending hints           — 10 hints, non-empty, no spoiler keywords
-//  10. Chen Ming branch       — v1.3 flags, new scene, conditional choice
-//  11. Chen/van evidence      — v1.4 conditional bridge choice, note scene
+//   9. Ending hints           �?10 hints, non-empty, no spoiler keywords
+//  10. Chen Ming branch       �?v1.3 flags, new scene, conditional choice
+//  11. Chen/van evidence      �?v1.4 conditional bridge choice, note scene
 
 const fs   = require("fs");
 const path = require("path");
@@ -59,8 +59,7 @@ function section(title) {
   console.log("\n── " + title + " " + "─".repeat(Math.max(0, 60 - title.length)));
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-section("1. Structural integrity");
+// ════════════════════════════════════════════════════════════════════════�?section("1. Structural integrity");
 
 // Duplicate scene IDs
 const seen = {};
@@ -98,11 +97,10 @@ const wsLines = src.split("\n").filter(l => /[ \t]+$/.test(l)).length;
 if (wsLines > 0) fail("trailing whitespace on " + wsLines + " line(s) in scenes.js");
 else pass("no trailing whitespace in scenes.js");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("2. Metadata");
+// ════════════════════════════════════════════════════════════════════════�?section("2. Metadata");
 
-if (meta.version !== "1.4.1")
-  fail("version expected 1.4.1, got " + meta.version);
+if (meta.version !== "1.5.0")
+  fail("version expected 1.5.0, got " + meta.version);
 else
   pass("version " + meta.version);
 
@@ -111,8 +109,7 @@ if (!map[meta.startSceneId])
 else
   pass("startSceneId '" + meta.startSceneId + "' resolves");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("3. Scene count and ending structure");
+// ════════════════════════════════════════════════════════════════════════�?section("3. Scene count and ending structure");
 
 const EXPECTED_SCENE_COUNT = 65;
 if (scenes.length !== EXPECTED_SCENE_COUNT)
@@ -120,7 +117,7 @@ if (scenes.length !== EXPECTED_SCENE_COUNT)
 else
   pass("scene count " + scenes.length);
 
-// Every scene whose type is "ending" must be terminal — choices must be empty.
+// Every scene whose type is "ending" must be terminal �?choices must be empty.
 let nonTerminalCount = 0;
 const endingTypeScenes = scenes.filter(s => s.type === "ending");
 endingTypeScenes.forEach(s => {
@@ -133,8 +130,7 @@ endingTypeScenes.forEach(s => {
 if (nonTerminalCount === 0)
   pass("all " + endingTypeScenes.length + " ending-type scenes are terminal");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("4. Required endings — present and reachable");
+// ════════════════════════════════════════════════════════════════════════�?section("4. Required endings �?present and reachable");
 
 const REQUIRED_ENDINGS = [
   "ending_full_truth",
@@ -158,8 +154,7 @@ REQUIRED_ENDINGS.forEach(id => {
     pass("present and reachable: " + id);
 });
 
-// ═════════════════════════════════════════════════════════════════════════
-section("5. Chapter 5 scenes present");
+// ════════════════════════════════════════════════════════════════════════�?section("5. Chapter 5 scenes present");
 
 const CHAPTER5_SCENES = [
   "chapter5_broadcast_returns",
@@ -185,8 +180,7 @@ CHAPTER5_SCENES.forEach(id => {
 if (ch5Missing === 0)
   pass("all " + CHAPTER5_SCENES.length + " chapter5 scenes present");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("6. Clue system");
+// ════════════════════════════════════════════════════════════════════════�?section("6. Clue system");
 
 const EXPECTED_CLUE_COUNT = 3;
 const clueKeys = Object.keys(CLUES);
@@ -211,8 +205,7 @@ scenes.forEach(s => {
 });
 if (badClueRefs === 0) pass("all addClue effect keys resolve");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("7. Game-logic invariants");
+// ════════════════════════════════════════════════════════════════════════�?section("7. Game-logic invariants");
 
 // Phase 9.3: the two core choices (report / end-shift) must stay unconditional.
 // v1.3: a third conditional choice (press_for_answer) is now expected and allowed.
@@ -262,8 +255,7 @@ if (!ftcGated)
 else
   pass("ending_full_truth_complete gated on jammerEvidenceSaved");
 
-// ═════════════════════════════════════════════════════════════════════════
-section("8. Archive catalogue");
+// ════════════════════════════════════════════════════════════════════════�?section("8. Archive catalogue");
 
 try {
   global.window = {};
@@ -271,7 +263,7 @@ try {
   const Archive = global.window.Archive;
 
   if (!Archive || !Array.isArray(Archive.ENDING_CATALOGUE)) {
-    fail("Archive.ENDING_CATALOGUE not found — check src/archive.js");
+    fail("Archive.ENDING_CATALOGUE not found �?check src/archive.js");
   } else {
     const cat = Archive.ENDING_CATALOGUE;
 
@@ -326,8 +318,7 @@ try {
   fail("failed to load src/archive.js: " + e.message);
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-section("9. Ending hints");
+// ════════════════════════════════════════════════════════════════════════�?section("9. Ending hints");
 
 try {
   global.window = {};
@@ -386,8 +377,7 @@ try {
   fail("failed to load data/endingHints.js: " + e.message);
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-section("10. Chen Ming branch (v1.3)");
+// ════════════════════════════════════════════════════════════════════════�?section("10. Chen Ming branch (v1.3)");
 
 // New scene present and reachable
 if (!map["chapter2_chen_under_pressure"])
@@ -480,8 +470,7 @@ if (!finalChoiceScene) {
     fail("end_shift_as_uncertain missing or has become conditional");
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-section("11. Chen / van evidence payoff (v1.4)");
+// ════════════════════════════════════════════════════════════════════════�?section("11. Chen / van evidence payoff (v1.4)");
 
 // New note scene present and reachable
 if (!map["chapter4_chen_van_evidence_note"])
@@ -543,7 +532,7 @@ if (!bridgeScene) {
     pass("check_broadcast still targets chapter5_broadcast_returns");
 }
 
-// Note scene exit: submit_and_end → ending_full_truth_complete
+// Note scene exit: submit_and_end �?ending_full_truth_complete
 const noteScene = map["chapter4_chen_van_evidence_note"];
 if (noteScene) {
   const submitAndEnd = noteScene.choices.find(c => c.id === "submit_and_end");
@@ -553,7 +542,6 @@ if (noteScene) {
     pass("submit_and_end targets ending_full_truth_complete");
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-console.log("");
+// ════════════════════════════════════════════════════════════════════════�?console.log("");
 console.log(failures === 0 ? "ALL CHECKS PASSED" : "FAILURES: " + failures);
 process.exit(failures > 0 ? 1 : 0);

@@ -12,6 +12,7 @@ window.UI = {
   _toggleWired:  false,
   _currentScene: null,
   _archiveWired: false,
+  _musicWired:   false,
 
   // Entry point called by Engine after every scene load.
   render(scene) {
@@ -163,6 +164,52 @@ window.UI = {
     this._archiveWired = true;
   },
 
+  _setMusicToggleLabel(isOn) {
+    const toggle = document.getElementById("music-toggle");
+    if (!toggle) return;
+    toggle.textContent = isOn ? "音乐 ON" : "音乐 OFF";
+    toggle.setAttribute("aria-pressed", isOn ? "true" : "false");
+  },
+
+  _tryPlayMusic() {
+    const audio = document.getElementById("bg-music");
+    if (!audio) return;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+    this._setMusicToggleLabel(!audio.paused);
+  },
+
+  _wireMusicControls() {
+    if (this._musicWired) return;
+    const audio    = document.getElementById("bg-music");
+    const toggle   = document.getElementById("music-toggle");
+    const beginBtn = document.getElementById("begin-btn");
+    if (!toggle) return;
+
+    if (audio) {
+      audio.volume = 0.35;
+      this._setMusicToggleLabel(!audio.paused);
+      audio.addEventListener("play",  () => { this._setMusicToggleLabel(true); });
+      audio.addEventListener("pause", () => { this._setMusicToggleLabel(false); });
+      toggle.addEventListener("click", () => {
+        if (audio.paused) this._tryPlayMusic();
+        else audio.pause();
+      });
+      if (beginBtn) {
+        beginBtn.addEventListener("click", () => {
+          if (audio.paused) this._tryPlayMusic();
+        });
+      }
+    } else {
+      this._setMusicToggleLabel(false);
+      toggle.addEventListener("click", () => { this._setMusicToggleLabel(false); });
+    }
+
+    this._musicWired = true;
+  },
+
   // Populate #archive-list and update #archive-count from Archive data.
   renderArchive() {
     const list  = document.getElementById("archive-list");
@@ -280,6 +327,7 @@ window.UI = {
   renderClues() {
     this._wireClueToggle();
     this._wireArchiveControls();
+    this._wireMusicControls();
 
     // Keep the floating toggle button text in sync with the current clue count.
     const toggleBtn = document.getElementById("clue-toggle");
@@ -332,6 +380,7 @@ window.UI = {
 // work before Engine.init() is ever called. _wireArchiveControls is idempotent,
 // so the later call from renderClues() is a safe no-op.
 UI._wireArchiveControls();
+UI._wireMusicControls();
 UI._initStartScreen();
 
 console.log("ui loaded");

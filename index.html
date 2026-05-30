@@ -9,6 +9,7 @@
 <body>
 
   <div class="monitor-overlay"></div>
+  <button id="music-toggle" type="button" aria-pressed="false">音乐 OFF</button>
 
   <div id="start-screen">
     <div class="terminal-brand">
@@ -59,6 +60,8 @@
       <div id="archive-list"></div>
     </div>
   </div>
+
+  <audio id="bg-music" src="assets/audio/lost-in-grief.mp3" preload="auto" loop></audio>
 
   <script src="data/metadata.js"></script>
   <script src="data/scenes.js"></script>
