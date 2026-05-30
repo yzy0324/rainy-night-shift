@@ -362,7 +362,8 @@ window.SCENES = [
       {
         id:          "press_on",
         label:       "你绕开了我的问题。你是怎么知道她名字的？",
-        nextSceneId: "chapter2_final_choice"
+        nextSceneId: "chapter2_final_choice",
+        effects:     [{ type: "setFlag", key: "challengedChen", value: true }]
       }
     ]
   },
@@ -411,7 +412,9 @@ window.SCENES = [
       {
         id:          "connect_dots",
         label:       "这些需要一并记录下来。",
-        nextSceneId: "chapter2_final_choice"
+        nextSceneId: "chapter2_final_choice",
+        // v1.4: supports the Chen/van evidence payoff at chapter4_full_truth_bridge.
+        effects:     [{ type: "setFlag", key: "connectedVanToChen", value: true }]
       }
     ]
   },
@@ -436,6 +439,34 @@ window.SCENES = [
         id:          "end_shift_as_uncertain",
         label:       "也许是，也许不是。值班结束了。",
         nextSceneId: "ending_loose_ends"
+      },
+      {
+        // v1.3: visible only when the player challenged Chen on knowing Lin Xia's name.
+        id:          "press_for_answer",
+        label:       "你没有回答我的问题。我已经记录了你今晚说的所有话。",
+        condition:   { type: "flag", key: "challengedChen", operator: "equals", value: true },
+        nextSceneId: "chapter2_chen_under_pressure"
+      }
+    ]
+  },
+
+  // ── Chapter 2: Chen under pressure ───────────────────────────────────────
+  // Reached only when challengedChen = true — the player pressed Chen twice on
+  // not answering the name question and invoked formal dispatch record-keeping.
+  // Chen, realising he is now on the record, gives one specific operational detail
+  // before hanging up. Hint: "旧三号站台" foreshadows Chapter 5 without spoiling.
+  // Routes to the same Chapter 3 entry as the normal investigation path.
+  {
+    id:        "chapter2_chen_under_pressure",
+    chapterId: "chapter2",
+    type:      "call",
+    speaker:   "陈明",
+    text:      "（沉默。）\n\n……那辆车，不只是在干扰信号。他们在等人。旧三号站台那一带——你查一下维修通道有没有记录在案的进出。\n\n（停顿。）\n\n你自己想清楚。",
+    choices: [
+      {
+        id:          "noted_continue",
+        label:       "记录已发出。",
+        nextSceneId: "ending_truth_uncovered"
       }
     ]
   },
@@ -1194,9 +1225,38 @@ window.SCENES = [
         nextSceneId: "ending_full_truth_complete"
       },
       {
+        // v1.4: Chen-testimony route — visible when player connected Chen Ming to
+        // the van signal disruption in chapter2_static_lead. Both this and
+        // submit_complete_evidence may appear if the player holds both flags.
+        id:          "submit_chen_van_evidence",
+        label:       "把陈明的证词与南门车辆记录一并提交。",
+        condition:   { type: "flag", key: "connectedVanToChen", operator: "equals", value: true },
+        nextSceneId: "chapter4_chen_van_evidence_note"
+      },
+      {
         id:          "check_broadcast",
         label:       "去查一下那个广播异常",
         nextSceneId: "chapter5_broadcast_returns"
+      }
+    ]
+  },
+
+  // ── Chapter 4: Chen / van evidence note ───────────────────────────────────
+  // Reached from chapter4_full_truth_bridge → submit_chen_van_evidence (v1.4).
+  // The player connected Chen Ming's call to the van and the signal disruption
+  // in Chapter 2. That dispatch record, combined with the memory card, forms a
+  // complete evidence chain via testimony rather than jammer camera footage.
+  {
+    id:        "chapter4_chen_van_evidence_note",
+    chapterId: "chapter4",
+    type:      "system",
+    speaker:   "系统",
+    text:      "调度中心的记录里，今晚有一条来自陈明的通话记录——他提到了停在路边的白色厢型车，和信号恢复的时间节点。这段记录，连同存储卡的内容，构成了一条可以追溯的证据链。\n\n这一次，案子的另一端不只是一段视频。",
+    choices: [
+      {
+        id:          "submit_and_end",
+        label:       "提交所有记录，结束值班。",
+        nextSceneId: "ending_full_truth_complete"
       }
     ]
   },

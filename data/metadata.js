@@ -14,12 +14,16 @@
 // v1.1:    ending archive — localStorage-backed ending collection with in-memory fallback.
 // v1.1.1:  post-ending atmospheric hints — one system-log line per ending.
 // v1.2.0:  second-run horror memory — start screen shifts state after horror endings.
+// v1.3.0:  Chen Ming Branch Payoff — challengedChen / connectedVanToChen flags,
+//          conditional Ch.2 choice, new chapter2_chen_under_pressure scene.
+// v1.4.0:  Chen / Van Evidence Payoff — connectedVanToChen now gates a second
+//          route to ending_full_truth_complete via chapter4_chen_van_evidence_note.
 // No import/export — window global, loaded by plain <script> tag.
 
 window.METADATA = {
   gameId:      "night-shift-dispatch",
   title:       "雨夜值班室 / Night Shift Dispatch",
-  version:     "1.2.0",
+  version:     "1.4.0",
   startSceneId: "chapter0_arrival"
 };
 

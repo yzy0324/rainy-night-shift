@@ -1,11 +1,11 @@
-// ── Canonical Integrity Check — v1.2.0 ───────────────────────────────────
+// ── Canonical Integrity Check — v1.4.0 ───────────────────────────────────
 // Run: node tools/verify-all.js
 //
 // Sections:
 //   1. Structural integrity   — broken links, duplicate IDs, ASCII IDs,
 //                               innerHTML, trailing whitespace
-//   2. Metadata               — version 1.2.0, startSceneId resolves
-//   3. Scene count & endings  — count 63, all ending-type scenes terminal
+//   2. Metadata               — version 1.4.0, startSceneId resolves
+//   3. Scene count & endings  — count 65, all ending-type scenes terminal
 //   4. Required endings       — 10 endings present and reachable
 //   5. Chapter 5 scenes       — all 14 scenes present
 //   6. Clue system            — count 3, all addClue keys resolve
@@ -13,6 +13,8 @@
 //   8. Archive catalogue      — 10 entries, no dupes, all IDs resolve,
 //                               hasAnyUnlocked is a function
 //   9. Ending hints           — 10 hints, non-empty, no spoiler keywords
+//  10. Chen Ming branch       — v1.3 flags, new scene, conditional choice
+//  11. Chen/van evidence      — v1.4 conditional bridge choice, note scene
 
 const fs   = require("fs");
 const path = require("path");
@@ -99,8 +101,8 @@ else pass("no trailing whitespace in scenes.js");
 // ═════════════════════════════════════════════════════════════════════════
 section("2. Metadata");
 
-if (meta.version !== "1.2.0")
-  fail("version expected 1.2.0, got " + meta.version);
+if (meta.version !== "1.4.0")
+  fail("version expected 1.4.0, got " + meta.version);
 else
   pass("version " + meta.version);
 
@@ -112,7 +114,7 @@ else
 // ═════════════════════════════════════════════════════════════════════════
 section("3. Scene count and ending structure");
 
-const EXPECTED_SCENE_COUNT = 63;
+const EXPECTED_SCENE_COUNT = 65;
 if (scenes.length !== EXPECTED_SCENE_COUNT)
   fail("scene count " + scenes.length + " (expected " + EXPECTED_SCENE_COUNT + ")");
 else
@@ -212,17 +214,21 @@ if (badClueRefs === 0) pass("all addClue effect keys resolve");
 // ═════════════════════════════════════════════════════════════════════════
 section("7. Game-logic invariants");
 
-// Phase 9.3: chapter2_final_choice must expose both choices unconditionally.
+// Phase 9.3: the two core choices (report / end-shift) must stay unconditional.
+// v1.3: a third conditional choice (press_for_answer) is now expected and allowed.
 const fc = map["chapter2_final_choice"];
 if (!fc) {
   fail("chapter2_final_choice missing");
 } else {
-  const gated = fc.choices.filter(c => c.condition);
-  if (gated.length > 0)
-    fail("chapter2_final_choice: " + gated.length +
-         " conditioned choice(s) found — expected 0");
+  const reportC   = fc.choices.find(c => c.id === "report_abnormal_event");
+  const endShiftC = fc.choices.find(c => c.id === "end_shift_as_uncertain");
+  const unexpected = fc.choices.filter(
+    c => c.condition && c.id !== "press_for_answer"
+  );
+  if (reportC && !reportC.condition && endShiftC && !endShiftC.condition && unexpected.length === 0)
+    pass("chapter2_final_choice: core choices unconditional, optional conditional allowed");
   else
-    pass("chapter2_final_choice: all " + fc.choices.length + " choices unconditional");
+    fail("chapter2_final_choice: core choices unexpectedly conditional or unexpected gated choice present");
 }
 
 // Phase 9.2: chapter5_voice_answers must always offer the safe exit.
@@ -378,6 +384,173 @@ try {
   }
 } catch (e) {
   fail("failed to load data/endingHints.js: " + e.message);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+section("10. Chen Ming branch (v1.3)");
+
+// New scene present and reachable
+if (!map["chapter2_chen_under_pressure"])
+  fail("chapter2_chen_under_pressure missing");
+else
+  pass("chapter2_chen_under_pressure present");
+
+if (!reachable.has("chapter2_chen_under_pressure"))
+  fail("chapter2_chen_under_pressure unreachable");
+else
+  pass("chapter2_chen_under_pressure reachable");
+
+// challengedChen flag seeded on press_on
+const corneredScene = map["chapter2_chen_cornered"];
+if (!corneredScene) {
+  fail("chapter2_chen_cornered missing");
+} else {
+  const pressOn = corneredScene.choices.find(c => c.id === "press_on");
+  if (!pressOn) {
+    fail("press_on choice missing from chapter2_chen_cornered");
+  } else {
+    const seedsChallenged = Array.isArray(pressOn.effects) &&
+      pressOn.effects.some(e => e.type === "setFlag" &&
+                                e.key  === "challengedChen" &&
+                                e.value === true);
+    if (!seedsChallenged)
+      fail("press_on does not set challengedChen = true");
+    else
+      pass("press_on sets challengedChen = true");
+  }
+}
+
+// connectedVanToChen flag seeded on connect_dots
+const staticLeadScene = map["chapter2_static_lead"];
+if (!staticLeadScene) {
+  fail("chapter2_static_lead missing");
+} else {
+  const connectDots = staticLeadScene.choices.find(c => c.id === "connect_dots");
+  if (!connectDots) {
+    fail("connect_dots choice missing from chapter2_static_lead");
+  } else {
+    const seedsVan = Array.isArray(connectDots.effects) &&
+      connectDots.effects.some(e => e.type === "setFlag" &&
+                                    e.key  === "connectedVanToChen" &&
+                                    e.value === true);
+    if (!seedsVan)
+      fail("connect_dots does not set connectedVanToChen = true");
+    else
+      pass("connect_dots sets connectedVanToChen = true");
+  }
+}
+
+// chapter2_final_choice: press_for_answer conditional choice present and correct
+const finalChoiceScene = map["chapter2_final_choice"];
+if (!finalChoiceScene) {
+  fail("chapter2_final_choice missing");
+} else {
+  const pfa = finalChoiceScene.choices.find(c => c.id === "press_for_answer");
+  if (!pfa) {
+    fail("press_for_answer choice missing from chapter2_final_choice");
+  } else {
+    const gatedCorrectly = pfa.condition &&
+      pfa.condition.type     === "flag" &&
+      pfa.condition.key      === "challengedChen" &&
+      pfa.condition.operator === "equals" &&
+      pfa.condition.value    === true;
+    if (!gatedCorrectly)
+      fail("press_for_answer not gated on challengedChen = true");
+    else
+      pass("press_for_answer gated on challengedChen = true");
+
+    if (pfa.nextSceneId !== "chapter2_chen_under_pressure")
+      fail("press_for_answer does not go to chapter2_chen_under_pressure");
+    else
+      pass("press_for_answer goes to chapter2_chen_under_pressure");
+  }
+
+  // Existing choices must remain unconditional
+  const reportChoice    = finalChoiceScene.choices.find(c => c.id === "report_abnormal_event");
+  const endShiftChoice  = finalChoiceScene.choices.find(c => c.id === "end_shift_as_uncertain");
+
+  if (reportChoice && !reportChoice.condition)
+    pass("report_abnormal_event remains unconditional");
+  else
+    fail("report_abnormal_event missing or has become conditional");
+
+  if (endShiftChoice && !endShiftChoice.condition)
+    pass("end_shift_as_uncertain remains unconditional");
+  else
+    fail("end_shift_as_uncertain missing or has become conditional");
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+section("11. Chen / van evidence payoff (v1.4)");
+
+// New note scene present and reachable
+if (!map["chapter4_chen_van_evidence_note"])
+  fail("chapter4_chen_van_evidence_note missing");
+else
+  pass("chapter4_chen_van_evidence_note present");
+
+if (!reachable.has("chapter4_chen_van_evidence_note"))
+  fail("chapter4_chen_van_evidence_note unreachable");
+else
+  pass("chapter4_chen_van_evidence_note reachable");
+
+// chapter4_full_truth_bridge: all choices intact and new choice correct
+const bridgeScene = map["chapter4_full_truth_bridge"];
+if (!bridgeScene) {
+  fail("chapter4_full_truth_bridge missing");
+} else {
+  // New conditional choice
+  const chenVan = bridgeScene.choices.find(c => c.id === "submit_chen_van_evidence");
+  if (!chenVan) {
+    fail("submit_chen_van_evidence missing from chapter4_full_truth_bridge");
+  } else {
+    const gatedCorrectly = chenVan.condition &&
+      chenVan.condition.type     === "flag"           &&
+      chenVan.condition.key      === "connectedVanToChen" &&
+      chenVan.condition.operator === "equals"         &&
+      chenVan.condition.value    === true;
+    if (!gatedCorrectly)
+      fail("submit_chen_van_evidence not gated on connectedVanToChen = true");
+    else
+      pass("submit_chen_van_evidence gated on connectedVanToChen = true");
+
+    if (chenVan.nextSceneId !== "chapter4_chen_van_evidence_note")
+      fail("submit_chen_van_evidence does not target chapter4_chen_van_evidence_note");
+    else
+      pass("submit_chen_van_evidence targets chapter4_chen_van_evidence_note");
+  }
+
+  // Regression: existing choices unchanged
+  const endShift = bridgeScene.choices.find(c => c.id === "end_shift");
+  if (!endShift || endShift.nextSceneId !== "ending_full_truth")
+    fail("end_shift missing or no longer targets ending_full_truth");
+  else
+    pass("end_shift still targets ending_full_truth");
+
+  const submitComplete = bridgeScene.choices.find(c => c.id === "submit_complete_evidence");
+  if (!submitComplete ||
+      !submitComplete.condition ||
+      submitComplete.condition.key !== "jammerEvidenceSaved" ||
+      submitComplete.nextSceneId   !== "ending_full_truth_complete")
+    fail("submit_complete_evidence missing, ungated, or wrong destination");
+  else
+    pass("submit_complete_evidence still gated on jammerEvidenceSaved OK");
+
+  const checkBroadcast = bridgeScene.choices.find(c => c.id === "check_broadcast");
+  if (!checkBroadcast || checkBroadcast.nextSceneId !== "chapter5_broadcast_returns")
+    fail("check_broadcast missing or no longer targets chapter5_broadcast_returns");
+  else
+    pass("check_broadcast still targets chapter5_broadcast_returns");
+}
+
+// Note scene exit: submit_and_end → ending_full_truth_complete
+const noteScene = map["chapter4_chen_van_evidence_note"];
+if (noteScene) {
+  const submitAndEnd = noteScene.choices.find(c => c.id === "submit_and_end");
+  if (!submitAndEnd || submitAndEnd.nextSceneId !== "ending_full_truth_complete")
+    fail("submit_and_end missing or does not target ending_full_truth_complete");
+  else
+    pass("submit_and_end targets ending_full_truth_complete");
 }
 
 // ═════════════════════════════════════════════════════════════════════════
